@@ -122,36 +122,41 @@ jobs:
             exit 1
           fi
 
-      # ── Make sure Pages is publishing THIS workflow, not Jekyll ──────────────
+      # ── Is Pages still letting Jekyll publish over this site? ────────────────
       #
-      # Pages has two sources: "Deploy from a branch" (GitHub runs its own Jekyll build)
-      # and "GitHub Actions" (this workflow). `enablement: true` below turns Pages on if
-      # it is off, but it does NOT change the source of an already-enabled site — and a
-      # site enabled that way defaults to the BRANCH source.
+      # Pages has two sources. "GitHub Actions" means this workflow publishes; "Deploy
+      # from a branch" (build_type `legacy`) means GitHub ALSO runs its own Jekyll build,
+      # which renders README.md and deploys that. Both write to the same site and
+      # whichever finishes last wins, so the published page alternates between the real
+      # app and the README with nothing ever failing.
       #
-      # The result is two publishers racing. GitHub's Jekyll build renders README.md and
-      # deploys that; this workflow deploys the real site; whichever finishes last wins.
-      # It did in fact alternate: one deploy served the site, the next served the README,
-      # with nothing failing either time.
+      # This step tries to correct it and then REPORTS, because trying is not enough:
+      # the default GITHUB_TOKEN cannot change the Pages source however many permissions
+      # the workflow requests, so the attempt below fails on most repositories. An earlier
+      # version of this step swallowed that failure behind continue-on-error and looked
+      # like it had fixed the problem for a fortnight while Jekyll went on racing.
       #
-      # So force the source to `workflow`. The token already carries pages:write for the
-      # deployment below, and once set, GitHub stops running its Jekyll build entirely.
-      - name: Ensure Pages is set to deploy from Actions
+      # The fix is a person, once: Settings → Pages → Source → GitHub Actions.
+      - name: Check Pages is not also building with Jekyll
         run: |
-          CURRENT=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type' 2>/dev/null || echo "none")
-          echo "Pages build_type is currently: $CURRENT"
+          CURRENT=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type' 2>/dev/null || echo "unknown")
           if [ "$CURRENT" = "workflow" ]; then
-            echo "Already correct."
-          elif [ "$CURRENT" = "none" ]; then
-            echo "Pages not enabled yet — configure-pages will enable it below."
+            echo "Pages source is 'GitHub Actions'. This workflow is the only publisher."
+            exit 0
+          fi
+          if [ "$CURRENT" = "unknown" ]; then
+            echo "Could not read the Pages configuration; skipping the check."
+            exit 0
+          fi
+
+          echo "Pages source is '$CURRENT' — trying to switch it to 'workflow'."
+          if gh api -X PUT "repos/$GITHUB_REPOSITORY/pages" -f build_type=workflow 2>/dev/null; then
+            echo "Switched. Jekyll will no longer publish over this site."
           else
-            echo "Switching from '$CURRENT' to 'workflow' so Jekyll stops publishing over this site."
-            gh api -X PUT "repos/$GITHUB_REPOSITORY/pages" -f build_type=workflow
+            echo "::warning title=Jekyll is racing this deploy::Pages is set to 'Deploy from a branch', so GitHub also builds this repo with Jekyll and publishes README.md over the site. Whichever finishes last wins. The job token cannot change this. Fix it once at Settings > Pages > Source > GitHub Actions."
           fi
         env:
           GH_TOKEN: ${{ github.token }}
-        # Advisory: if the token is not permitted to change this (an org policy, say), the
-        # deploy should still run — and the manual fix is Settings → Pages → Source.
         continue-on-error: true
 
       - uses: actions/configure-pages@v5
