@@ -1,0 +1,130 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { stats as statsApi } from "@/lib/api/endpoints";
+import { useApi } from "@/lib/hooks/use-api";
+import { useAuth } from "@/lib/auth/context";
+import { SITE } from "@/lib/site";
+import { cn } from "@/lib/utils";
+import { AchievementsPanel } from "./achievements-panel";
+import { CommitteesPanel } from "./committees-panel";
+import { EventsPanel } from "./events-panel";
+import { GalleryPanel } from "./gallery-panel";
+import { MembersPanel } from "./members-panel";
+import { MessagesPanel } from "./messages-panel";
+import { AccountPanel, SettingsPanel } from "./settings-panel";
+
+const TABS = [
+  { id: "committees", label: "Committees" },
+  { id: "members", label: "Members" },
+  { id: "events", label: "Events" },
+  { id: "gallery", label: "Gallery" },
+  { id: "achievements", label: "Achievements" },
+  { id: "messages", label: "Inbox" },
+  { id: "settings", label: "Settings" },
+  { id: "account", label: "Account" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+export function Dashboard() {
+  const { username } = useAuth();
+  const [tab, setTab] = useState<TabId>("committees");
+  const { data: stats } = useApi(() => statsApi.getForAdmin(), []);
+
+  const counters = [
+    { label: "Committees", value: stats?.counts.committees },
+    { label: "Members", value: stats?.counts.members },
+    { label: "Upcoming", value: stats?.counts.upcomingEvents },
+    { label: "Photos", value: stats?.counts.photos },
+    { label: "Achievements", value: stats?.counts.achievements },
+    { label: "Unread", value: stats?.unreadMessages, alert: true },
+  ];
+
+  return (
+    <div className="min-h-screen">
+      <header className="border-b border-line bg-bg2">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
+          <div>
+            <p className="font-display text-lg font-black tracking-[2px] text-sky">
+              {SITE.name} Admin
+            </p>
+            <p className="mt-0.5 text-xs text-muted">Signed in as {username}</p>
+          </div>
+          <Link
+            href="/"
+            className="rounded-lg border border-line2 px-3 py-1.5 text-xs text-sky hover:bg-sky/10"
+          >
+            View site →
+          </Link>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <dl className="mb-8 grid grid-cols-3 gap-3 sm:grid-cols-6">
+          {counters.map((counter) => (
+            <div key={counter.label} className="card-surface px-3 py-3 text-center">
+              <dd
+                className={cn(
+                  "font-mono text-xl font-bold tabular-nums",
+                  // Unread messages are the one counter that should pull the eye, and
+                  // only when there actually are any.
+                  counter.alert && (counter.value ?? 0) > 0 ? "text-gold" : "text-sky",
+                )}
+              >
+                {counter.value ?? "—"}
+              </dd>
+              <dt className="mt-0.5 text-[0.6rem] tracking-wider text-muted uppercase">
+                {counter.label}
+              </dt>
+            </div>
+          ))}
+        </dl>
+
+        <div
+          role="tablist"
+          aria-label="Admin sections"
+          className="mb-8 flex flex-wrap gap-2 border-b border-line pb-3"
+        >
+          {TABS.map((item) => (
+            <button
+              key={item.id}
+              role="tab"
+              aria-selected={tab === item.id}
+              onClick={() => setTab(item.id)}
+              className={cn(
+                "rounded-lg px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-colors",
+                tab === item.id
+                  ? "bg-sky/12 text-sky"
+                  : "text-muted hover:bg-card2 hover:text-ink",
+              )}
+            >
+              {item.label}
+              {item.id === "messages" && (stats?.unreadMessages ?? 0) > 0 ? (
+                <span className="ms-1.5 rounded-full bg-gold px-1.5 font-mono text-[0.6rem] text-bg">
+                  {stats?.unreadMessages}
+                </span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+
+        {/*
+          Each panel is mounted only while its tab is open, so switching tabs refetches.
+          Deliberate: these panels edit the same underlying data as each other, and a
+          cached members list that a committee deletion has since orphaned is worse than
+          one extra request.
+        */}
+        {tab === "committees" ? <CommitteesPanel /> : null}
+        {tab === "members" ? <MembersPanel /> : null}
+        {tab === "events" ? <EventsPanel /> : null}
+        {tab === "gallery" ? <GalleryPanel /> : null}
+        {tab === "achievements" ? <AchievementsPanel /> : null}
+        {tab === "messages" ? <MessagesPanel /> : null}
+        {tab === "settings" ? <SettingsPanel /> : null}
+        {tab === "account" ? <AccountPanel /> : null}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,74 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Lets you re-deploy from the Actions tab without pushing a commit — needed after
+  # changing either NEXT_PUBLIC_* variable, since both are baked in at build time.
+  workflow_dispatch:
+
+# Read the repo, write a Pages deployment, and mint the OIDC token Pages requires.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. `cancel-in-progress: false` so a running deploy is allowed to
+# FINISH rather than being killed halfway — a half-published site is worse than a stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # 24, not 20: `node --test` runs the TypeScript test files directly, and type
+          # stripping is only on by default from Node 23.6.
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # The gates. A site that does not typecheck is not published.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build static export
+        run: npm run build
+        env:
+          # Repository → Settings → Secrets and variables → Actions → Variables.
+          #   NEXT_PUBLIC_SITE_URL     e.g. https://yaseenyk.github.io/SIT-FE
+          #   NEXT_PUBLIC_API_BASE_URL e.g. https://sit-be.onrender.com
+          #
+          # Variables, not secrets: both are compiled into the JavaScript the browser
+          # downloads, so neither is secret and masking them in logs would only make a
+          # failed build harder to read.
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

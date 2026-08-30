@@ -1,0 +1,211 @@
+/*
+ * Tailwind v4 auto-scans the whole project by default. That would sweep up CLAUDE.md and
+ * docs/*.md — and those files NAME utility classes while discussing them, which Tailwind
+ * reads as usage and compiles into the bundle. Pin the scan to src/ instead.
+ *
+ * If a source directory is ever added outside src/, add an explicit @source for it;
+ * Tailwind will silently emit nothing for it otherwise.
+ */
+@import "tailwindcss" source(none);
+@source "../../src";
+
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ * AISA DESIGN TOKENS
+ *
+ * A straight port of the :root custom properties from the original single-file
+ * site, so the site keeps the look it has. What changes is that they are now
+ * Tailwind theme tokens: `bg-surface` and `text-sky` are real utilities, and a
+ * raw hex in a component is a lint-visible mistake rather than the norm.
+ *
+ * The palette is a committed dark theme. There is no light mode and no
+ * prefers-color-scheme block — the site is dark, deliberately, and a
+ * half-considered light variant would be worse than none.
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+@theme {
+  /* Surfaces, darkest to lightest. */
+  --color-bg: #020c18;
+  --color-bg2: #041424;
+  --color-surface: #061828;
+  --color-card: #071e30;
+  --color-card2: #082236;
+
+  /* The accent. `sky` is the interactive colour and the brand colour both. */
+  --color-sky: #38bdf8;
+  --color-sky2: #0ea5e9;
+  --color-sky3: #7dd3fc;
+  --color-cyan: #22d3ee;
+
+  /* Status. Semantic, and never used decoratively. */
+  --color-emerald: #10b981;
+  --color-gold: #f59e0b;
+  --color-rose: #f43f5e;
+
+  /* Text and lines. */
+  --color-ink: #e0f2fe;
+  --color-muted: #5d8fad;
+  --color-line: rgb(56 189 248 / 0.12);
+  --color-line2: rgb(56 189 248 / 0.25);
+
+  /*
+   * Three families, as in the original:
+   *   display — Orbitron, for the wordmark and section headings
+   *   sans    — Exo 2, for everything else
+   *   mono    — JetBrains Mono, for stats and code-ish labels
+   * The --font-* variables are set by next/font in layout.tsx.
+   */
+  --font-display: var(--font-orbitron), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-exo2), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", monospace;
+
+  /* The fixed navbar height. Section scroll offsets are derived from it. */
+  --spacing-nav: 4.375rem; /* 70px */
+
+  --animate-rise-in: rise-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 260ms ease-out both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /*
+     * Every in-page link lands under the fixed navbar without it. This is the CSS
+     * equivalent of the manual offset arithmetic the old handleHashScroll() did in
+     * JavaScript on every anchor click.
+     */
+    scroll-padding-top: var(--spacing-nav);
+  }
+
+  /* Honour the OS setting. The site is heavy on motion, so this is not optional. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  /* The focus ring is the keyboard user's cursor. Visible, on brand, never removed. */
+  :focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-sky2);
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  /*
+   * The repeats that earn a class.
+   *
+   * Everything else in this codebase is utilities on the element. These are here because
+   * they are used on dozens of elements each, and because getting the gradient text right
+   * takes four interdependent properties that are easy to half-copy.
+   */
+  .text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-sky3),
+      var(--color-cyan) 55%,
+      var(--color-sky)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /*
+   * The card.
+   *
+   * A flat fill on a flat page gave every card the same weight as its background, which is
+   * most of why the first version read as unfinished. The gradient is barely perceptible on
+   * its own; what it does is give the surface a top-lit direction, so a grid of cards looks
+   * like objects on a page rather than outlined rectangles.
+   */
+  .card-surface {
+    background-image: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--color-card2) 90%, transparent),
+      var(--color-card)
+    );
+    border: 1px solid var(--color-line);
+    border-radius: 1rem;
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.04) inset,
+      0 12px 32px -16px rgb(0 0 0 / 0.6);
+  }
+
+  /* The glow that separates an active or hovered card from a resting one. */
+  .glow-sky {
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.06) inset,
+      0 0 0 1px rgb(56 189 248 / 0.12),
+      0 18px 40px -20px rgb(56 189 248 / 0.35);
+  }
+
+  /*
+   * A faint engineering grid, used behind the hero.
+   *
+   * The particle canvas alone left the hero reading as text floating in a void. A grid
+   * gives the space a floor without competing for attention, and the mask fades it out
+   * before it reaches the content.
+   */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(56 189 248 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(56 189 248 / 0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  }
+
+  /* Separates two stacked sections without drawing a hard line across the page. */
+  .edge-top {
+    border-top: 1px solid var(--color-line);
+  }
+}
