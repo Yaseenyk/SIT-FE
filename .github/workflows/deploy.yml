@@ -57,7 +57,19 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
           NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
 
+      # `enablement: true` asks the action to turn Pages on itself if it is off.
+      #
+      # Without it this step is where a brand-new repository fails: Pages defaults to
+      # disabled, the action cannot find a Pages site, and it errors with "Get Pages site
+      # failed" — after every build step has already passed, which makes it read like a
+      # build problem rather than a settings one.
+      #
+      # It is not a substitute for the setting. If an org policy blocks Actions from
+      # enabling Pages, this still fails and someone has to set
+      # Settings → Pages → Source: GitHub Actions by hand.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
