@@ -44,18 +44,65 @@ jobs:
       - name: Test
         run: npm test
 
+      # ── Where this site will live ────────────────────────────────────────────
+      #
+      # `basePath` derives from NEXT_PUBLIC_SITE_URL, so getting it wrong does not fail
+      # the build — it publishes a site whose every stylesheet and script 404s, which
+      # looks like raw unstyled HTML. That is what happens when the variable is simply
+      # unset: next.config.ts falls back to localhost:3000, whose pathname is empty, so
+      # basePath becomes "" and assets resolve to the domain root.
+      #
+      # So the project-page URL is DERIVED from the repository by default, and the
+      # variable is an override for a custom domain rather than a requirement.
+      - name: Resolve site URL
+        id: site
+        run: |
+          if [ -n "${{ vars.NEXT_PUBLIC_SITE_URL }}" ]; then
+            URL="${{ vars.NEXT_PUBLIC_SITE_URL }}"
+            echo "Using NEXT_PUBLIC_SITE_URL from repository variables."
+          else
+            # Pages lowercases the owner in the domain; the repo path keeps its case.
+            OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            URL="https://${OWNER}.github.io/${{ github.event.repository.name }}"
+            echo "No NEXT_PUBLIC_SITE_URL variable set — derived the project-page URL."
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Building for $URL"
+
+      - name: Warn if the API is not configured
+        if: vars.NEXT_PUBLIC_API_BASE_URL == ''
+        run: |
+          echo "::warning title=No API configured::NEXT_PUBLIC_API_BASE_URL is unset, so the \
+          site will call http://localhost:8080 and every section will show 'Could not load'. \
+          Set it under Settings > Secrets and variables > Actions > Variables once the \
+          backend is deployed, then re-run this workflow."
+
       - name: Build static export
         run: npm run build
         env:
-          # Repository → Settings → Secrets and variables → Actions → Variables.
-          #   NEXT_PUBLIC_SITE_URL     e.g. https://yaseenyk.github.io/SIT-FE
-          #   NEXT_PUBLIC_API_BASE_URL e.g. https://sit-be.onrender.com
-          #
           # Variables, not secrets: both are compiled into the JavaScript the browser
           # downloads, so neither is secret and masking them in logs would only make a
           # failed build harder to read.
-          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ steps.site.outputs.url }}
           NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+
+      # basePath is the one thing that fails silently and only in production, so assert
+      # it in CI rather than discovering it by looking at the published site.
+      - name: Verify asset paths carry the basePath
+        run: |
+          EXPECTED=$(node -e 'process.stdout.write(new URL(process.argv[1]).pathname.replace(/\/$/, ""))' "${{ steps.site.outputs.url }}")
+          if [ -z "$EXPECTED" ]; then
+            echo "Custom domain (no basePath) — nothing to check."
+            exit 0
+          fi
+          if grep -q "\"$EXPECTED/_next/" out/index.html; then
+            echo "OK: assets are prefixed with $EXPECTED"
+          else
+            echo "::error title=basePath missing::Assets in out/index.html are not prefixed \
+            with '$EXPECTED'. The published site would 404 every stylesheet and script."
+            grep -o '"/[^"]*_next/static/[^"]*"' out/index.html | head -3
+            exit 1
+          fi
 
       # `enablement: true` asks the action to turn Pages on itself if it is off.
       #
