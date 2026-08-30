@@ -99,7 +99,7 @@ function FeaturedEvent({ event }: { event: AisaEvent }) {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 50% 80% at 100% 0%, rgb(56 189 248 / 0.12), transparent 70%)",
+            "radial-gradient(ellipse 50% 80% at 100% 0%, rgb(168 85 247 / 0.14), transparent 70%)",
         }}
       />
       <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start">
@@ -111,7 +111,7 @@ function FeaturedEvent({ event }: { event: AisaEvent }) {
             {event.tag ? <Badge tone="sky">{event.tag}</Badge> : null}
           </div>
 
-          <h3 className="mt-4 font-display text-2xl leading-tight font-black tracking-wide text-balance sm:text-3xl">
+          <h3 className="mt-4 font-display text-2xl leading-tight font-black tracking-tight text-balance sm:text-3xl">
             {event.title}
           </h3>
 
@@ -151,7 +151,7 @@ function EventRow({ event, muted }: { event: AisaEvent; muted: boolean }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2.5">
-          <h3 className="font-display text-base font-bold tracking-wide">{event.title}</h3>
+          <h3 className="font-display text-base font-bold tracking-tight">{event.title}</h3>
           {event.tag ? <Badge tone={muted ? "muted" : "sky"}>{event.tag}</Badge> : null}
         </div>
         <p className="mt-1 font-mono text-[0.7rem] text-muted">{event.dateLabel}</p>

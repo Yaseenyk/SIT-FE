@@ -98,7 +98,7 @@ export function Achievements() {
                         ) : null}
                       </div>
 
-                      <h3 className="mt-2.5 font-display text-base leading-snug font-bold tracking-wide text-balance">
+                      <h3 className="mt-2.5 font-display text-base leading-snug font-bold tracking-tight text-balance">
                         {achievement.title}
                       </h3>
 

@@ -241,7 +241,7 @@ export function Panel({
     <section>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-bold tracking-wide">{title}</h2>
+          <h2 className="font-display text-lg font-bold tracking-tight">{title}</h2>
           {description ? <p className="mt-1 text-xs text-muted">{description}</p> : null}
         </div>
         {action}

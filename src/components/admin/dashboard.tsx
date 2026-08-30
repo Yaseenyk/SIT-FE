@@ -47,7 +47,7 @@ export function Dashboard() {
       <header className="border-b border-line bg-bg2">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
           <div>
-            <p className="font-display text-lg font-black tracking-[2px] text-sky">
+            <p className="font-display text-lg font-extrabold tracking-tight text-sky">
               {SITE.name} Admin
             </p>
             <p className="mt-0.5 text-xs text-muted">Signed in as {username}</p>

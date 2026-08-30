@@ -1,27 +1,25 @@
 import type { Metadata } from "next";
-import { Exo_2, JetBrains_Mono, Orbitron } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { SITE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 /**
- * The three families the original loaded from a Google Fonts <link>.
+ * Two families, per the streamerOS brand kit.
  *
- * next/font self-hosts them: the files are emitted into the static export and served from
+ * Inter replaces the original site's Orbitron + Exo 2 pairing. Orbitron is a squared-off
+ * display face, and setting every heading and card title in it is what made the page read
+ * as a game UI rather than a university department's. Inter at 700-800 carries the same
+ * confidence without the costume, and one family means a card's title, label and paragraph
+ * are no longer three typefaces inside forty vertical pixels.
+ *
+ * next/font self-hosts both: the files are emitted into the static export and served from
  * the site's own origin. That removes a render-blocking request to a third party, removes
- * the layout shift while it resolves, and means the site still has its typography on a
- * network that blocks fonts.googleapis.com.
+ * the layout shift while it resolves, and means the site keeps its typography on a network
+ * that blocks fonts.googleapis.com.
  */
-const orbitron = Orbitron({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "900"],
-  variable: "--font-orbitron",
-  display: "swap",
-});
-
-const exo2 = Exo_2({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-exo2",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -97,10 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // --font-sans: var(--font-exo2) at :root, and a custom property is substituted where
     // it is DECLARED — a variable that only exists on <body> resolves to nothing at :root,
     // and every heading silently falls back to the browser default. No error, no warning.
-    <html
-      lang="en"
-      className={`${orbitron.variable} ${exo2.variable} ${jetbrains.variable}`}
-    >
+    <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
       <body>
         <script
           type="application/ld+json"

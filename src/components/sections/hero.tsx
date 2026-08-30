@@ -40,7 +40,8 @@ export function Hero() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 70% 55% at 20% 35%, rgb(14 165 233 / 0.13) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 50% at 8% 45%, rgb(34 211 238 / 0.16) 0%, transparent 68%)," +
+            "radial-gradient(ellipse 55% 55% at 92% 12%, rgb(168 85 247 / 0.15) 0%, transparent 66%)",
         }}
       />
 
@@ -57,18 +58,24 @@ export function Hero() {
               {SITE.department}
             </p>
 
-            <h1 className="font-display text-5xl leading-[0.95] font-black tracking-tight sm:text-7xl lg:text-8xl">
-              <span className="text-gradient">AISA</span>
+            {/*
+              The headline is a claim, not the acronym.
+              "AISA" set at 8xl told a first-time visitor nothing they could act on — the
+              organisation's name is already in the navbar, the tab title and the footer.
+              A sentence earns the space; the name is demoted to the line beneath it.
+            */}
+            {/* text-balance evens the lines, but it can only work inside a box wide enough
+                to have a choice — at max-w-2xl this headline was forced to strand a single
+                word on its own line. */}
+            <h1 className="max-w-3xl font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-balance sm:text-[3.4rem]">
+              Where AIML students{" "}
+              <span className="text-gradient">build things that run</span>.
             </h1>
 
-            <p className="mt-5 max-w-lg font-display text-xl leading-tight font-bold tracking-wide text-ink sm:text-2xl">
-              The AIML Student Association at BSIET Kolhapur
-            </p>
-
-            <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
-              We run the workshops, hackathons and reading groups that turn a syllabus into
-              something you can build with — and make sure every student who wants to get
-              their hands on this work has somewhere to start.
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted">
+              AISA is the student association of the Department of CSE (AI &amp; ML) at
+              BSIET Kolhapur. We run the workshops, hackathons and reading groups that turn
+              a syllabus into something you can build with.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
@@ -107,7 +114,7 @@ export function Hero() {
                 {nextEvent.emoji ?? "📌"}
               </p>
 
-              <h2 className="mt-4 font-display text-xl leading-snug font-bold tracking-wide text-balance">
+              <h2 className="mt-4 font-display text-xl leading-snug font-bold tracking-tight text-balance">
                 {nextEvent.title}
               </h2>
 

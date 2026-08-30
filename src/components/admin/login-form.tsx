@@ -46,10 +46,10 @@ export function LoginForm() {
     <main className="flex min-h-screen items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <Link href="/" className="font-display text-2xl font-black tracking-[2px] text-sky">
+          <Link href="/" className="font-display text-2xl font-extrabold tracking-tight text-sky">
             {SITE.name}
           </Link>
-          <h1 className="mt-4 font-display text-sm font-bold tracking-wide">Admin sign in</h1>
+          <h1 className="mt-4 font-display text-sm font-bold tracking-tight">Admin sign in</h1>
           <p className="mt-1 text-xs text-muted">Committee members only.</p>
         </div>
 

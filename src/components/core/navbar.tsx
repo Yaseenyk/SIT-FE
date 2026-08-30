@@ -60,12 +60,12 @@ export function Navbar() {
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
           <span
             aria-hidden
-            className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-sky2 to-cyan font-display text-[0.6rem] leading-tight font-black text-bg"
+            className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-sky to-violet font-display text-[0.6rem] leading-tight font-black text-bg"
           >
             AISA
           </span>
           <span className="leading-tight">
-            <span className="block font-display text-lg font-black tracking-[2px] text-sky">
+            <span className="block font-display text-lg font-extrabold tracking-tight text-sky">
               {SITE.name}
             </span>
             <span className="block text-[0.58rem] tracking-wider text-muted">

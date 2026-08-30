@@ -99,7 +99,7 @@ export function Structure() {
                     ) : null}
                   </div>
 
-                  <h3 className="mt-5 font-display text-lg leading-snug font-bold tracking-wide text-balance">
+                  <h3 className="mt-5 font-display text-lg leading-snug font-bold tracking-tight text-balance">
                     {committee.name}
                   </h3>
 

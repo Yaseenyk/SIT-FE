@@ -52,7 +52,7 @@ export function SectionHeading({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="font-display text-3xl leading-[1.1] font-black tracking-wide text-balance sm:text-[2.75rem]">
+      <h2 className="font-display text-3xl leading-[1.1] font-black tracking-tight text-balance sm:text-[2.75rem]">
         {title} {accent ? <span className="text-gradient">{accent}</span> : null}
       </h2>
       {description ? (
@@ -148,7 +148,7 @@ export function EmptyState({ icon, title, hint }: { icon: string; title: string;
       <span className="mb-4 text-4xl opacity-60" aria-hidden>
         {icon}
       </span>
-      <p className="font-display text-sm font-bold tracking-wide">{title}</p>
+      <p className="font-display text-sm font-bold tracking-tight">{title}</p>
       {hint ? <p className="mt-2 max-w-sm text-xs leading-relaxed text-muted">{hint}</p> : null}
     </div>
   );

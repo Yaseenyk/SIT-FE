@@ -71,7 +71,7 @@ export function AnnouncementBar() {
   return (
     <div
       role="status"
-      className="fixed inset-x-0 top-0 z-60 flex items-center justify-center gap-3 bg-gradient-to-r from-sky2 to-cyan px-4 py-2 text-center text-xs font-semibold text-bg"
+      className="fixed inset-x-0 top-0 z-60 flex items-center justify-center gap-3 bg-gradient-to-r from-sky to-violet px-4 py-2 text-center text-xs font-semibold text-bg"
     >
       <span>{announcement.text}</span>
       <button

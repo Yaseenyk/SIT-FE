@@ -173,7 +173,7 @@ export function Gallery() {
             className="max-h-[72vh] max-w-full rounded-xl object-contain shadow-2xl"
           />
           <div className="text-center">
-            <p className="font-display text-sm font-bold tracking-wide">{current.title}</p>
+            <p className="font-display text-sm font-bold tracking-tight">{current.title}</p>
             {current.description ? (
               <p className="mx-auto mt-1.5 max-w-lg text-xs text-muted">{current.description}</p>
             ) : null}

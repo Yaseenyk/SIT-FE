@@ -74,7 +74,7 @@ export function About() {
                       0{index + 1}
                     </span>
                   </div>
-                  <h3 className="mt-5 font-display text-base font-bold tracking-wide text-sky">
+                  <h3 className="mt-5 font-display text-base font-bold tracking-tight text-sky">
                     {feature.title}
                   </h3>
                   <p className="mt-2.5 text-sm leading-relaxed text-muted">

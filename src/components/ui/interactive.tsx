@@ -148,7 +148,7 @@ export function Modal({
       )}
     >
       <div className="flex items-center justify-between border-b border-line px-6 py-4">
-        <h3 className="font-display text-sm font-bold tracking-wide">{title}</h3>
+        <h3 className="font-display text-sm font-bold tracking-tight">{title}</h3>
         <button
           onClick={onClose}
           aria-label="Close"
@@ -178,7 +178,7 @@ export function ErrorNotice({ error, onRetry }: { error: ApiError; onRetry?: () 
       role="alert"
       className="col-span-full rounded-xl border border-rose/25 bg-rose/8 px-6 py-8 text-center"
     >
-      <p className="font-display text-sm font-bold tracking-wide text-rose">
+      <p className="font-display text-sm font-bold tracking-tight text-rose">
         Could not load this section
       </p>
       <p className="mx-auto mt-2 max-w-md text-xs text-muted">{error.message}</p>
