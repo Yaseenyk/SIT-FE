@@ -77,7 +77,7 @@ export function AnnouncementBar() {
       <button
         onClick={() => dismiss(announcement.text)}
         aria-label="Dismiss announcement"
-        className="rounded px-1.5 leading-none font-bold hover:bg-bg/15"
+        className="rounded px-1.5 leading-none font-bold hover:bg-page/15"
       >
         ✕
       </button>

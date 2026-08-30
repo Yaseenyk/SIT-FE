@@ -2,247 +2,183 @@
  * Tailwind v4 auto-scans the whole project by default. That would sweep up CLAUDE.md and
  * docs/*.md — and those files NAME utility classes while discussing them, which Tailwind
  * reads as usage and compiles into the bundle. Pin the scan to src/ instead.
- *
- * If a source directory is ever added outside src/, add an explicit @source for it;
- * Tailwind will silently emit nothing for it otherwise.
  */
 @import "tailwindcss" source(none);
 @source "../../src";
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════
- * AISA DESIGN TOKENS — streamerOS "Signal" brand kit
+ * AISA — institutional theme
  *
- * Adopted from d:\Streamer OS\streamer-os-website (brand/README.md): ink ground,
- * a cyan→purple gradient for emphasis, and Inter throughout.
+ * Derived from the parent institute's own site (bsiet.org): white ground, deep
+ * navy #07294d / #133984, a green #00b964, and a gold #ffdd61.
  *
- * What this replaced, and why. The first version ported the original site's
- * palette AND its typography — Orbitron for every heading, Exo 2 for body. A
- * squared-off sci-fi display face on every card title is what made the site read
- * as a game UI rather than a department's. Inter at a heavy weight carries the
- * same confidence without the costume.
+ * WHY THIS REPLACED THE DARK THEME
  *
- * Surfaces are alpha over the ink, not opaque hexes. On a near-black ground a
- * translucent surface picks up whatever glow sits behind it, so cards near the
- * hero wash read warmer than cards in a flat section — depth for free.
+ * The previous build was near-black with cyan→purple gradient headings, glowing
+ * cards, an animated particle field and emoji standing in for icons. Every one of
+ * those is a marker of a generated SaaS landing page, and together they made a
+ * university department read as a crypto product. No college or university site
+ * looks like that.
  *
- * Committed dark. There is no light mode and no prefers-color-scheme block: a
- * half-considered light variant would be worse than none.
+ * What they do look like — and what this is: a white ground, one institutional
+ * colour used with restraint, real horizontal rules, dense text, and information
+ * organised for someone looking something up rather than for someone being sold to.
+ *
+ * The accent is gold and appears almost nowhere: section rules, the active nav
+ * item, a few counters. Navy carries the structure. Restraint is the whole point —
+ * colour used everywhere is what made the old version look synthetic.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 @theme {
   /* ── Ground ─────────────────────────────────────────────────────────────── */
-  --color-bg: #05070a; /* ink — brand kit */
-  --color-bg2: #080b10; /* the alternating band; barely lighter, on purpose */
-  --color-surface: #06090d;
+  --color-page: #ffffff;
+  --color-surface: #f6f7f9; /* alternating section band */
+  --color-sunken: #eef1f5; /* table headers, wells */
 
-  /* ── Surfaces: alpha over ink, so they pick up the glow behind them ─────── */
-  --color-card: rgb(255 255 255 / 0.03);
-  --color-card2: rgb(255 255 255 / 0.06);
+  /* ── Institutional navy. The structural colour. ─────────────────────────── */
+  --color-navy: #07294d;
+  --color-navy2: #133984; /* the institute's link/heading blue */
+  --color-navy3: #294a70;
+  --color-navy-tint: #eef2f8;
 
-  /* ── The gradient. Cyan at the floor, purple at the peak. ───────────────── */
-  --color-sky: #22d3ee; /* cyan — the interactive colour */
-  --color-sky2: #06b6d4; /* the pressed/solid variant */
-  --color-sky3: #67e8f9; /* ice — the pulse */
-  --color-cyan: #22d3ee;
-  --color-violet: #a855f7; /* purple — gradient peak, and emphasis only */
-  --color-violet2: #c084fc;
+  /* ── Accent. Used sparingly: rules, active states, a few numbers. ───────── */
+  --color-gold: #b3861a;
+  --color-gold-soft: #fdf6e4;
 
-  /* ── Status. Semantic, and deliberately outside the brand gradient. ─────── */
-  --color-emerald: #10b981;
-  --color-gold: #f59e0b;
-  --color-rose: #f43f5e;
+  /* ── Status. Semantic only, never decorative. ───────────────────────────── */
+  --color-green: #0f7a4a;
+  --color-green-soft: #e8f5ee;
+  --color-amber: #a86a12;
+  --color-amber-soft: #fdf1de;
+  --color-red: #b3261e;
+  --color-red-soft: #fdeceb;
 
-  /* ── Text and lines ─────────────────────────────────────────────────────── */
-  --color-ink: #e4e4e7; /* zinc-200 */
-  --color-muted: #8b8b96;
-  --color-line: rgb(255 255 255 / 0.08);
-  --color-line2: rgb(255 255 255 / 0.16);
+  /* ── Text and rules ─────────────────────────────────────────────────────── */
+  --color-ink: #16202e;
+  --color-body: #3d4757;
+  --color-muted: #6b7686;
+  --color-rule: #dfe4ec;
+  --color-rule-strong: #c3ccd9;
 
   /*
-   * Two families, not three.
+   * A serif for headings, a sans for everything else.
    *
-   * Inter does the headings and the body; the old build used a different face for
-   * each, which meant a card title, its label and its paragraph were three
-   * typefaces in forty vertical pixels. Mono survives for micro-labels and
-   * numbers, where the fixed advance is doing real work.
+   * The single biggest reason the old build read as machine-made was setting every
+   * heading in a geometric display face with a gradient fill. A text serif is what
+   * academic institutions actually use, and it does the work no amount of layout
+   * can: it makes the page look like it belongs to a college.
    */
-  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", monospace;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  /* The fixed navbar height. Section scroll offsets derive from it. */
-  --spacing-nav: 4.375rem; /* 70px */
-
-  --animate-rise-in: rise-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-fade-in: fade-in 260ms ease-out both;
-}
-
-@keyframes rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  --spacing-nav: 4.5rem;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    /*
-     * Every in-page link lands under the fixed navbar without this. It is the CSS
-     * equivalent of the manual offset arithmetic the original site did in JavaScript
-     * on every anchor click.
-     */
-    scroll-padding-top: var(--spacing-nav);
+    /* Every in-page link would otherwise land under the sticky header. */
+    scroll-padding-top: calc(var(--spacing-nav) + 1rem);
+    -webkit-text-size-adjust: 100%;
   }
 
-  /* Honour the OS setting. The site is heavy on motion, so this is not optional. */
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
     }
-
     *,
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
   }
 
   body {
-    background-color: var(--color-bg);
-    color: var(--color-ink);
+    background-color: var(--color-page);
+    color: var(--color-body);
     font-family: var(--font-sans);
-    overflow-x: hidden;
-    /* From the brand kit's own layout. Cheap, and it makes a selection feel deliberate. */
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    color: var(--color-ink);
+    /* Source Serif needs no negative tracking; it is drawn for text, not display. */
+    letter-spacing: 0;
   }
 
   ::selection {
-    background-color: rgb(34 211 238 / 0.3);
-    color: #fff;
+    background-color: rgb(19 57 132 / 0.15);
   }
 
-  /*
-   * Inter is optically large at display sizes and its default tracking is set for
-   * body copy. Every heading therefore gets negative tracking; without it a
-   * six-word headline looks spaced out rather than set.
-   */
-  h1,
-  h2,
-  h3 {
-    letter-spacing: -0.02em;
-  }
-
-  /* The focus ring is the keyboard user's cursor. Visible, on brand, never removed. */
+  /* The focus ring is the keyboard user's cursor. Never removed. */
   :focus-visible {
-    outline: 2px solid var(--color-sky);
+    outline: 2px solid var(--color-navy2);
     outline-offset: 2px;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--color-bg);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgb(255 255 255 / 0.12);
-    border-radius: 3px;
   }
 }
 
 @layer components {
   /*
-   * The brand gradient, cyan → purple, used on the emphasised half of a heading.
+   * A section heading with a short gold rule above it.
    *
-   * `inline-block` matters: a gradient clipped to a wrapped inline span is
-   * recomputed per line box, so a two-line heading gets the full ramp twice and
-   * the join is visible mid-word.
+   * This is the one piece of ornament in the design, and it is doing a real job:
+   * it marks where a section begins on a long, dense, single-column page. The old
+   * build used gradient text for the same purpose, which marked nothing and looked
+   * like decoration because it was.
    */
-  .text-gradient {
-    display: inline-block;
-    background-image: linear-gradient(
-      100deg,
-      var(--color-sky) 0%,
-      var(--color-sky3) 35%,
-      var(--color-violet) 100%
-    );
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
+  .section-rule::before {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 3px;
+    background-color: var(--color-gold);
+    margin-bottom: 1rem;
   }
 
   /*
-   * The card. A translucent pane on ink, not an opaque fill.
+   * The card. A white pane with a real border.
    *
-   * The 1px inset highlight along the top edge is what stops it reading as a flat
-   * rectangle: it implies a light source above, which is the whole trick behind
-   * this style of dark UI.
+   * Borders rather than glows, and a shadow so slight it reads as paper rather than
+   * as an effect. On a white page a visible border is what separates content; on the
+   * old dark page nothing was separated and every card floated.
    */
-  .card-surface {
-    background-color: var(--color-card);
-    border: 1px solid var(--color-line);
-    border-radius: 0.875rem;
-    box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.05) inset;
+  .card {
+    background-color: var(--color-page);
+    border: 1px solid var(--color-rule);
+    border-radius: 0.375rem;
   }
 
-  /* The lift for a hovered or active card. */
-  .glow-sky {
-    border-color: rgb(34 211 238 / 0.35);
-    box-shadow:
-      0 1px 0 0 rgb(255 255 255 / 0.07) inset,
-      0 0 0 1px rgb(34 211 238 / 0.1),
-      0 20px 45px -25px rgb(34 211 238 / 0.4);
+  .card-hover {
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .card-hover:hover {
+    border-color: var(--color-rule-strong);
+    box-shadow: 0 1px 3px rgb(16 32 46 / 0.08);
+  }
+
+  /* The thin band above the header carrying contact details — a college-site staple. */
+  .utility-bar {
+    background-color: var(--color-navy);
+    color: #dbe4f0;
   }
 
   /*
-   * A faint engineering grid, behind the hero.
-   *
-   * The particle canvas alone left the hero reading as text floating in a void.
-   * The grid gives the space a floor without competing for attention, and the
-   * mask fades it out before it reaches the copy.
+   * Body copy inside a content block. Set once so every paragraph on the site has
+   * the same measure and leading, which is most of what makes dense text readable.
    */
-  .bg-grid {
-    background-image:
-      linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 85% 65% at 50% 0%, #000 25%, transparent 78%);
-  }
-
-  /* Separates stacked sections without drawing a hard line across the page. */
-  .edge-top {
-    border-top: 1px solid var(--color-line);
-  }
-
-  /*
-   * The micro-label above a section heading: mono, uppercase, cyan, tiny.
-   * Straight from the brand kit's own section headers.
-   */
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-sky);
+  .prose-block p {
+    max-width: 68ch;
+    line-height: 1.75;
   }
 }

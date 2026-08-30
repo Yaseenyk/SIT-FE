@@ -88,7 +88,7 @@ export function MembersPanel() {
         <ErrorNotice error={members.error} onRetry={members.reload} />
       ) : (
         <TableShell>
-          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Name</th>
               <th className="px-4 py-3 text-start">Role</th>
@@ -99,7 +99,7 @@ export function MembersPanel() {
           </thead>
           <tbody>
             {(members.data ?? []).map((member) => (
-              <tr key={member.id} className="border-t border-line">
+              <tr key={member.id} className="border-t border-rule">
                 <td className="px-4 py-3">
                   <span className="flex items-center gap-2.5">
                     {member.photoUrl ? (

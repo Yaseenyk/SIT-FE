@@ -42,8 +42,7 @@ export function SettingsPanel() {
           feature3Description: value("feature3Description"),
           feature4Title: value("feature4Title"),
           feature4Description: value("feature4Description"),
-        }),
-      "Settings saved — every page picks this up on next load",
+        }),"Settings saved — every page picks this up on next load",
     );
     if (ok) data.reload();
   }
@@ -61,7 +60,7 @@ export function SettingsPanel() {
 
       <form onSubmit={onSubmit} className="space-y-8">
         <fieldset className="space-y-4">
-          <legend className="mb-2 font-display text-xs font-bold tracking-wider text-sky uppercase">
+          <legend className="mb-2 font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
             Contact
           </legend>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -119,7 +118,7 @@ export function SettingsPanel() {
         </fieldset>
 
         <fieldset className="space-y-4">
-          <legend className="mb-2 font-display text-xs font-bold tracking-wider text-sky uppercase">
+          <legend className="mb-2 font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
             About section
           </legend>
           <Field label="Heading" htmlFor="s-about-title">
@@ -193,8 +192,8 @@ export function AccountPanel() {
         ) : null}
 
         {data.data?.announcement ? (
-          <p className="mb-4 rounded-lg border border-line bg-card2 px-4 py-2.5 text-xs">
-            Live now: <span className="text-sky">{data.data.announcement.text}</span>
+          <p className="mb-4 rounded-lg border border-rule bg-sunken px-4 py-2.5 text-xs">
+            Live now: <span className="text-navy2">{data.data.announcement.text}</span>
           </p>
         ) : null}
 
@@ -209,8 +208,7 @@ export function AccountPanel() {
                   // datetime-local has no timezone; the browser's own offset is what the
                   // admin meant, so let Date apply it before sending an instant.
                   expiresAt ? new Date(expiresAt).toISOString() : null,
-                ),
-              "Announcement published",
+                ),"Announcement published",
             );
             if (ok) {
               setText("");
@@ -248,8 +246,7 @@ export function AccountPanel() {
               disabled={announcement.busy || !data.data?.announcement}
               onClick={async () => {
                 const ok = await announcement.run(
-                  () => settingsApi.clearAnnouncement(),
-                  "Announcement taken down",
+                  () => settingsApi.clearAnnouncement(),"Announcement taken down",
                 );
                 if (ok) data.reload();
               }}
@@ -278,13 +275,12 @@ export function AccountPanel() {
                   authApi.changePassword(
                     String(form.get("currentPassword") ?? ""),
                     String(form.get("newPassword") ?? ""),
-                  ),
-                "Password changed",
+                  ),"Password changed",
               );
               if (ok) event.currentTarget?.reset();
             }}
           >
-            <h3 className="font-display text-xs font-bold tracking-wider text-sky uppercase">
+            <h3 className="font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
               Change password
             </h3>
             <Field label="Current password" htmlFor="cp-current" required>
@@ -331,7 +327,7 @@ export function AccountPanel() {
               if (ok) event.currentTarget?.reset();
             }}
           >
-            <h3 className="font-display text-xs font-bold tracking-wider text-sky uppercase">
+            <h3 className="font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
               Change username
             </h3>
             <Field label="Password" htmlFor="cu-current" required>
@@ -353,7 +349,7 @@ export function AccountPanel() {
           </form>
         </div>
 
-        <div className="mt-8 border-t border-line pt-6">
+        <div className="mt-8 border-t border-rule pt-6">
           <Button variant="ghost" onClick={signOut}>
             Sign out
           </Button>

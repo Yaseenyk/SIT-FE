@@ -6,13 +6,12 @@ import type { ApiError } from "@/lib/api/client";
 
 /**
  * The client-side primitives: anything with a handler, focus management, or state.
- *
  * Kept separate from primitives.tsx so importing a Card into a server component does not
  * drag "use client" along with it.
  */
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "sm" | "md";
 };
 
@@ -24,15 +23,16 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const variants = {
-    primary: "bg-sky2 text-bg hover:bg-sky font-bold",
-    ghost: "border border-line2 text-sky hover:bg-sky/10",
-    danger: "border border-rose/40 text-rose hover:bg-rose/10",
+    primary: "bg-navy text-white hover:bg-navy3",
+    secondary: "border border-rule-strong bg-page text-ink hover:bg-surface",
+    ghost: "text-navy2 hover:bg-navy-tint",
+    danger: "border border-red/30 text-red hover:bg-red-soft",
   } as const;
 
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg tracking-wide transition-colors",
+        "inline-flex items-center justify-center gap-2 rounded font-semibold transition-colors",
         // Disabled buttons must still look disabled while a request is in flight, which
         // is the only time this component is disabled.
         "disabled:cursor-not-allowed disabled:opacity-50",
@@ -48,11 +48,11 @@ export function Button({
 }
 
 /**
- * The filter pills above Structure, Events, Gallery and Achievements.
+ * The filter control above Structure, Events, Gallery and Achievements.
  *
- * A segmented control in a single bordered track, rather than loose pills floating on the
- * page. The loose version read as four unrelated buttons and gave no hint that picking one
- * deselects the others.
+ * An underlined tab strip rather than floating pills. Tabs sitting on a rule are the
+ * convention for switching a list's contents, and they read as part of the page furniture
+ * instead of as decoration.
  */
 export function FilterTabs<T extends string>({
   options,
@@ -73,10 +73,7 @@ export function FilterTabs<T extends string>({
     <div
       role="tablist"
       aria-label={label}
-      className={cn(
-        "inline-flex flex-wrap gap-1 rounded-full border border-line bg-bg2/60 p-1 backdrop-blur",
-        className,
-      )}
+      className={cn("flex flex-wrap items-end gap-6 border-b border-rule", className)}
     >
       {options.map((option) => {
         const active = option.value === value;
@@ -87,10 +84,10 @@ export function FilterTabs<T extends string>({
             aria-selected={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              "rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide transition-all",
+              "-mb-px border-b-2 pb-2.5 text-sm font-semibold transition-colors",
               active
-                ? "bg-sky2 text-bg shadow-sm"
-                : "text-muted hover:bg-card2 hover:text-ink",
+                ? "border-gold text-ink"
+                : "border-transparent text-muted hover:border-rule-strong hover:text-ink",
             )}
           >
             {option.label}
@@ -142,24 +139,25 @@ export function Modal({
         if (e.target === ref.current) onClose();
       }}
       className={cn(
-        "m-auto w-[min(38rem,calc(100vw-2rem))] rounded-xl border border-line2 bg-card p-0 text-ink",
-        "backdrop:bg-bg/80 backdrop:backdrop-blur-sm",
-        "open:animate-fade-in",
+        "m-auto w-[min(40rem,calc(100vw-2rem))] rounded border border-rule bg-page p-0 text-body",
+        "backdrop:bg-navy/40",
       )}
     >
-      <div className="flex items-center justify-between border-b border-line px-6 py-4">
-        <h3 className="font-display text-sm font-bold tracking-tight">{title}</h3>
+      <div className="flex items-center justify-between border-b border-rule px-6 py-4">
+        <h3 className="font-serif text-lg font-bold text-ink">{title}</h3>
         <button
           onClick={onClose}
           aria-label="Close"
-          className="rounded-md px-2 py-1 text-muted transition-colors hover:bg-card2 hover:text-ink"
+          className="rounded px-2 py-1 text-muted transition-colors hover:bg-surface hover:text-ink"
         >
           ✕
         </button>
       </div>
       <div className="max-h-[70vh] overflow-y-auto px-6 py-5">{children}</div>
       {footer ? (
-        <div className="flex justify-end gap-2 border-t border-line px-6 py-4">{footer}</div>
+        <div className="flex justify-end gap-2 border-t border-rule bg-surface px-6 py-4">
+          {footer}
+        </div>
       ) : null}
     </dialog>
   );
@@ -168,22 +166,19 @@ export function Modal({
 /**
  * The failure state for a section whose data did not load.
  *
- * Every section on this site fetches at runtime, so this is a real, reachable state —
- * the API sleeping on a free tier is enough to produce it — and it offers a retry rather
- * than leaving a blank space.
+ * Every section fetches at runtime, so this is a real, reachable state — the API sleeping
+ * on a free tier is enough to produce it — and it offers a retry rather than a blank space.
  */
 export function ErrorNotice({ error, onRetry }: { error: ApiError; onRetry?: () => void }) {
   return (
     <div
       role="alert"
-      className="col-span-full rounded-xl border border-rose/25 bg-rose/8 px-6 py-8 text-center"
+      className="col-span-full rounded border border-red/25 bg-red-soft px-6 py-6 text-center"
     >
-      <p className="font-display text-sm font-bold tracking-tight text-rose">
-        Could not load this section
-      </p>
-      <p className="mx-auto mt-2 max-w-md text-xs text-muted">{error.message}</p>
+      <p className="font-serif text-base font-semibold text-red">Could not load this section</p>
+      <p className="mx-auto mt-2 max-w-md text-sm text-body">{error.message}</p>
       {onRetry ? (
-        <Button variant="ghost" size="sm" className="mt-4" onClick={onRetry}>
+        <Button variant="secondary" size="sm" className="mt-4" onClick={onRetry}>
           Try again
         </Button>
       ) : null}

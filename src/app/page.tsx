@@ -7,6 +7,7 @@ import { Contact } from "@/components/sections/contact";
 import { Events } from "@/components/sections/events";
 import { Gallery } from "@/components/sections/gallery";
 import { Hero } from "@/components/sections/hero";
+import { Join } from "@/components/sections/join";
 import { Structure } from "@/components/sections/structure";
 import { SettingsProvider } from "@/lib/settings-context";
 
@@ -33,6 +34,7 @@ export default function HomePage() {
         <Events />
         <Gallery />
         <Achievements />
+        <Join />
         <Contact />
       </main>
       <Footer />

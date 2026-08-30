@@ -44,17 +44,17 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-line bg-bg2">
+      <header className="border-b border-rule bg-surface">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
           <div>
-            <p className="font-display text-lg font-extrabold tracking-tight text-sky">
+            <p className="font-serif text-lg font-extrabold tracking-tight text-navy2">
               {SITE.name} Admin
             </p>
             <p className="mt-0.5 text-xs text-muted">Signed in as {username}</p>
           </div>
           <Link
             href="/"
-            className="rounded-lg border border-line2 px-3 py-1.5 text-xs text-sky hover:bg-sky/10"
+            className="rounded-lg border border-rule-strong px-3 py-1.5 text-xs text-navy2 hover:bg-navy/10"
           >
             View site →
           </Link>
@@ -64,13 +64,12 @@ export function Dashboard() {
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <dl className="mb-8 grid grid-cols-3 gap-3 sm:grid-cols-6">
           {counters.map((counter) => (
-            <div key={counter.label} className="card-surface px-3 py-3 text-center">
+            <div key={counter.label} className="card px-3 py-3 text-center">
               <dd
-                className={cn(
-                  "font-mono text-xl font-bold tabular-nums",
+                className={cn("font-mono text-xl font-bold tabular-nums",
                   // Unread messages are the one counter that should pull the eye, and
                   // only when there actually are any.
-                  counter.alert && (counter.value ?? 0) > 0 ? "text-gold" : "text-sky",
+                  counter.alert && (counter.value ?? 0) > 0 ? "text-gold" : "text-navy2",
                 )}
               >
                 {counter.value ?? "—"}
@@ -85,7 +84,7 @@ export function Dashboard() {
         <div
           role="tablist"
           aria-label="Admin sections"
-          className="mb-8 flex flex-wrap gap-2 border-b border-line pb-3"
+          className="mb-8 flex flex-wrap gap-2 border-b border-rule pb-3"
         >
           {TABS.map((item) => (
             <button
@@ -93,11 +92,10 @@ export function Dashboard() {
               role="tab"
               aria-selected={tab === item.id}
               onClick={() => setTab(item.id)}
-              className={cn(
-                "rounded-lg px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-colors",
+              className={cn("rounded-lg px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-colors",
                 tab === item.id
-                  ? "bg-sky/12 text-sky"
-                  : "text-muted hover:bg-card2 hover:text-ink",
+                  ? "bg-navy/12 text-navy2"
+                  : "text-muted hover:bg-sunken hover:text-ink",
               )}
             >
               {item.label}

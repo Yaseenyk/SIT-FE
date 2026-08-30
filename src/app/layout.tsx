@@ -1,22 +1,29 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import { SITE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 /**
- * Two families, per the streamerOS brand kit.
+ * A text serif for headings, Inter for everything else.
  *
- * Inter replaces the original site's Orbitron + Exo 2 pairing. Orbitron is a squared-off
- * display face, and setting every heading and card title in it is what made the page read
- * as a game UI rather than a university department's. Inter at 700-800 carries the same
- * confidence without the costume, and one family means a card's title, label and paragraph
- * are no longer three typefaces inside forty vertical pixels.
+ * This pairing is doing more work than any layout change. The site previously set every
+ * heading in a geometric display face with a gradient fill, which is the typographic
+ * signature of a generated landing page — and a university department wearing it read as
+ * a crypto product. Source Serif 4 is a workhorse text serif; it is what academic
+ * institutions actually use, and it makes the page look like it belongs to a college
+ * before a single word is read.
  *
- * next/font self-hosts both: the files are emitted into the static export and served from
- * the site's own origin. That removes a render-blocking request to a third party, removes
- * the layout shift while it resolves, and means the site keeps its typography on a network
- * that blocks fonts.googleapis.com.
+ * next/font self-hosts all three: the files are emitted into the static export and served
+ * from the site's own origin. That removes a render-blocking request to a third party,
+ * removes the layout shift while it resolves, and means the site keeps its typography on
+ * a network that blocks fonts.googleapis.com.
  */
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-source-serif",
+  display: "swap",
+});
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -95,7 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // --font-sans: var(--font-exo2) at :root, and a custom property is substituted where
     // it is DECLARED — a variable that only exists on <body> resolves to nothing at :root,
     // and every heading silently falls back to the browser default. No error, no warning.
-    <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${inter.variable} ${sourceSerif.variable} ${jetbrains.variable}`}>
       <body>
         <script
           type="application/ld+json"

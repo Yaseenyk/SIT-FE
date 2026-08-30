@@ -16,11 +16,17 @@ const FILTERS = [
 
 type Filter = (typeof FILTERS)[number]["value"];
 
-/** Each category gets its own colour and mark, so the list is scannable by type. */
+/**
+ * Each category gets a colour, and nothing else.
+ *
+ * The previous version stamped a 7xl emoji watermark across every card. That is a
+ * generated-page mannerism, and on a page listing students' real accomplishments it
+ * trivialised them. A coloured label is enough to scan by.
+ */
 const CATEGORY = {
-  competition: { tone: "gold", icon: "🏆", label: "Competition" },
-  research: { tone: "sky", icon: "📄", label: "Research" },
-  internship: { tone: "emerald", icon: "💼", label: "Internship" },
+  competition: { tone: "gold", label: "Competition" },
+  research: { tone: "navy", label: "Research" },
+  internship: { tone: "green", label: "Internship" },
 } as const;
 
 function categoryOf(value: string | null) {
@@ -36,55 +42,38 @@ export function Achievements() {
   );
 
   return (
-    <section id="achievements" className="edge-top relative bg-bg2 py-24 sm:py-32">
+    <section id="achievements" className="border-b border-rule bg-surface py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-8">
-          <SectionHeading
-            eyebrow="Recognition"
-            title="Student"
-            accent="Achievements"
-            description="Competitions won, papers published, and offers earned by AIML students."
-            className="mb-0"
-          />
-          <FilterTabs
-            label="Filter achievements"
-            options={FILTERS}
-            value={filter}
-            onChange={setFilter}
-            className="mb-0"
-          />
-        </div>
+        <SectionHeading
+          eyebrow="Recognition"
+          title="Student achievements"
+          description="Competitions won, papers published, and internships earned by students of the department."
+        />
+        <FilterTabs
+          label="Filter achievements"
+          options={FILTERS}
+          value={filter}
+          onChange={setFilter}
+          className="mb-8"
+        />
 
         <div className="grid gap-5 md:grid-cols-2">
           {loading ? (
-            [0, 1, 2, 3].map((index) => <Skeleton key={index} className="h-44" />)
+            [0, 1, 2, 3].map((index) => <Skeleton key={index} className="h-40" />)
           ) : error ? (
             <ErrorNotice error={error} onRetry={reload} />
           ) : (data ?? []).length === 0 ? (
             <EmptyState
-              icon="🏆"
               title="No achievements recorded yet"
-              hint="Won something? Tell the media committee and it will appear here."
+              hint="Won a competition or published a paper? Tell the Media committee and it will be listed here."
             />
           ) : (
             (data ?? []).map((achievement) => {
               const category = categoryOf(achievement.category);
               return (
-                <article
-                  key={achievement.id}
-                  className="card-surface group relative overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:border-line2 hover:glow-sky"
-                >
-                  {/* A large, faint category mark. It gives each card a distinguishing
-                      shape at a glance without adding another element to read. */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute -end-3 -top-3 text-7xl opacity-[0.07] transition-opacity group-hover:opacity-[0.12]"
-                  >
-                    {category?.icon ?? "✦"}
-                  </span>
-
-                  <div className="relative flex items-start gap-4">
-                    <Avatar src={achievement.photoUrl} name={achievement.student} size="lg" />
+                <article key={achievement.id} className="card card-hover p-5">
+                  <div className="flex items-start gap-4">
+                    <Avatar src={achievement.photoUrl} name={achievement.student} size="md" />
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
@@ -92,24 +81,24 @@ export function Achievements() {
                           <Badge tone={category.tone}>{category.label}</Badge>
                         ) : null}
                         {achievement.achievedOn ? (
-                          <span className="font-mono text-[0.65rem] text-muted">
+                          <span className="text-xs text-muted">
                             {formatDate(achievement.achievedOn)}
                           </span>
                         ) : null}
                       </div>
 
-                      <h3 className="mt-2.5 font-display text-base leading-snug font-bold tracking-tight text-balance">
+                      <h3 className="mt-2 font-serif text-base leading-snug font-bold text-ink text-balance">
                         {achievement.title}
                       </h3>
 
-                      <p className="mt-1.5 text-sm font-semibold text-sky">
+                      <p className="mt-1 text-sm font-semibold text-navy2">
                         {achievement.student}
                       </p>
                     </div>
                   </div>
 
                   {achievement.description ? (
-                    <p className="relative mt-4 text-sm leading-relaxed text-muted">
+                    <p className="mt-3 border-t border-rule pt-3 text-sm leading-relaxed text-body">
                       {achievement.description}
                     </p>
                   ) : null}

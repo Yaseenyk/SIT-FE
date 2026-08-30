@@ -1,89 +1,117 @@
 "use client";
 
-import { SectionHeading, Skeleton } from "@/components/ui/primitives";
+import { Avatar, Fact, SectionHeading, Skeleton } from "@/components/ui/primitives";
+import { committees as committeesApi } from "@/lib/api/endpoints";
+import { useApi } from "@/lib/hooks/use-api";
 import { useSettings } from "@/lib/settings-context";
+import { SITE } from "@/lib/site";
 
-/** Icons for the four feature blurbs. Positional, matching feature1..feature4 on the API. */
-const FEATURE_ICONS = ["🎓", "⚙️", "🔬", "🤝"] as const;
-
-/**
- * What the association does.
- *
- * A two-column split — heading on the left, the four pillars stacked on the right — rather
- * than a centred heading over a four-across row. The row gave each pillar a narrow column
- * roughly a hundred pixels wide, which is not enough for a sentence, so every card was a
- * word and a fragment. Two-up gives them room to say something.
- */
 export function About() {
   const { settings, loading } = useSettings();
+  const committees = useApi(() => committeesApi.list(), []);
 
   // Blank entries are dropped rather than rendered as empty cards — an admin who fills in
-  // two of the four should get two cards, not two cards and two empty boxes.
-  const features = (settings?.features ?? []).filter(
-    (feature) => feature.title || feature.description,
-  );
+  // two of the four should get two, not two and two empty boxes.
+  const features = (settings?.features ?? []).filter((f) => f.title || f.description);
+
+  /*
+   * The advisory committee, surfaced.
+   *
+   * It was fetched and then deliberately filtered out of the Structure grid, so the
+   * faculty who oversee the association appeared nowhere on the site at all. On a college
+   * page that is the wrong omission to make: the faculty advisors are usually the first
+   * thing a parent or a visiting department looks for.
+   */
+  const advisory = (committees.data ?? []).find((c) => c.type === "advisory") ?? null;
 
   return (
-    <section id="about" className="edge-top relative bg-bg2 py-24 sm:py-32">
+    <section id="about" className="border-b border-rule py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
+        <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+          <div className="prose-block">
             <SectionHeading
-              eyebrow="Who we are"
-              title="About"
-              accent="AISA"
-              description={settings?.aboutDescription ?? undefined}
-              className="mb-8"
+              eyebrow="About us"
+              title={settings?.aboutTitle ?? `About ${SITE.name}`}
+              className="mb-6"
             />
-            <dl className="flex gap-8 border-t border-line pt-8">
-              <div>
-                <dt className="font-mono text-[0.65rem] tracking-[0.15em] text-muted uppercase">
-                  Department
-                </dt>
-                <dd className="mt-1.5 text-sm font-semibold">CSE (AI &amp; ML)</dd>
-              </div>
-              <div>
-                <dt className="font-mono text-[0.65rem] tracking-[0.15em] text-muted uppercase">
-                  Institute
-                </dt>
-                <dd className="mt-1.5 text-sm font-semibold">BSIET, Kolhapur</dd>
-              </div>
-            </dl>
+
+            {loading ? (
+              <Skeleton className="h-24" />
+            ) : (
+              <p className="text-[0.95rem] leading-relaxed text-body">
+                {settings?.aboutDescription}
+              </p>
+            )}
+
+            {features.length > 0 ? (
+              <>
+                <h3 className="mt-10 mb-4 font-serif text-lg font-bold text-ink">
+                  What the association does
+                </h3>
+                <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+                  {features.map((feature, index) => (
+                    <div key={feature.title ?? index} className="border-l-2 border-gold pl-4">
+                      <h4 className="font-serif text-base font-bold text-ink">{feature.title}</h4>
+                      <p className="mt-1.5 text-sm leading-relaxed text-body">
+                        {feature.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : null}
           </div>
 
-          {loading ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[0, 1, 2, 3].map((index) => (
-                <Skeleton key={index} className="h-44" />
-              ))}
+          <aside className="space-y-8">
+            {/* A labelled facts panel — the "at a glance" box college pages always carry. */}
+            <div className="card p-6">
+              <h3 className="font-serif text-base font-bold text-ink">At a glance</h3>
+              <dl className="mt-3">
+                <Fact label="Department">Computer Science &amp; Engineering (AI &amp; ML)</Fact>
+                <Fact label="Institute">{SITE.institute}</Fact>
+                <Fact label="Location">{settings?.address ?? `${SITE.city}, Maharashtra`}</Fact>
+                <Fact label="Committees">
+                  {committees.data ? `${committees.data.length} active` : "—"}
+                </Fact>
+              </dl>
             </div>
-          ) : (
-            <ul className="grid gap-4 sm:grid-cols-2">
-              {features.map((feature, index) => (
-                <li
-                  key={feature.title ?? index}
-                  className="card-surface group p-7 transition-all duration-300 hover:-translate-y-1 hover:border-line2 hover:glow-sky"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="text-3xl" aria-hidden>
-                      {FEATURE_ICONS[index] ?? "✦"}
-                    </span>
-                    {/* A quiet index. It gives the four cards an order to be read in,
-                        which a bare grid of icons does not. */}
-                    <span className="font-mono text-xs text-muted/50 tabular-nums">
-                      0{index + 1}
-                    </span>
-                  </div>
-                  <h3 className="mt-5 font-display text-base font-bold tracking-tight text-sky">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2.5 text-sm leading-relaxed text-muted">
-                    {feature.description}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
+
+            {advisory ? (
+              <div className="card p-6">
+                <h3 className="font-serif text-base font-bold text-ink">{advisory.name}</h3>
+                <p className="mt-1 text-sm text-muted">
+                  Academic and administrative oversight of the association.
+                </p>
+                <ul className="mt-4 space-y-4">
+                  {advisory.coordinator ? (
+                    <li className="flex items-center gap-3">
+                      <Avatar src={advisory.coordinatorPhoto} name={advisory.coordinator} />
+                      <span>
+                        <span className="block text-sm font-semibold text-ink">
+                          {advisory.coordinator}
+                        </span>
+                        <span className="block text-xs text-muted">
+                          {advisory.coordLabel}
+                          {advisory.coordinatorSub ? ` · ${advisory.coordinatorSub}` : null}
+                        </span>
+                      </span>
+                    </li>
+                  ) : null}
+                  {advisory.coordinator2 ? (
+                    <li className="flex items-center gap-3">
+                      <Avatar src={advisory.coordinator2Photo} name={advisory.coordinator2} />
+                      <span>
+                        <span className="block text-sm font-semibold text-ink">
+                          {advisory.coordinator2}
+                        </span>
+                        <span className="block text-xs text-muted">{advisory.coord2Label}</span>
+                      </span>
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : null}
+          </aside>
         </div>
       </div>
     </section>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { NeuronCanvas } from "@/components/core/neuron-canvas";
 import { SectionHeading } from "@/components/ui/primitives";
 import { Button } from "@/components/ui/interactive";
 import { ApiError } from "@/lib/api/client";
@@ -16,8 +15,8 @@ type Status =
   | { kind: "failed"; message: string };
 
 const FIELD =
-  "w-full rounded-xl border border-line bg-bg/70 px-4 py-3 text-sm text-ink " +
-  "placeholder:text-muted/60 transition-colors focus:border-sky focus:bg-bg focus:outline-none";
+  "w-full rounded border border-rule bg-page px-3 py-2.5 text-sm text-ink " +
+  "placeholder:text-muted/70 transition-colors focus:border-navy2 focus:outline-none";
 
 export function Contact() {
   const { settings } = useSettings();
@@ -35,8 +34,8 @@ export function Contact() {
         email: String(data.get("email") ?? ""),
         subject: String(data.get("subject") ?? ""),
         message: String(data.get("message") ?? ""),
-        // The honeypot. Hidden from people, filled by naive bots; the server discards
-        // any submission that has it set, and answers 202 either way.
+        // The honeypot. Hidden from people, filled by naive bots; the server discards any
+        // submission that has it set, and answers 202 either way.
         website: String(data.get("website") ?? ""),
       });
       form.reset();
@@ -52,103 +51,103 @@ export function Contact() {
 
   const sending = status.kind === "sending";
 
-  const details = [
-    settings?.email
-      ? { label: "Email", value: settings.email, href: `mailto:${settings.email}`, icon: "✉" }
-      : null,
-    settings?.phone
-      ? { label: "Phone", value: settings.phone, href: telHref(settings.phone), icon: "☎" }
-      : null,
-    settings?.address
-      ? {
-          label: "Address",
-          value: settings.address,
-          href: mapsHref(settings.address),
-          icon: "◎",
-        }
-      : null,
-  ].filter((detail) => detail !== null);
-
   return (
-    <section id="contact" className="edge-top relative overflow-hidden py-24 sm:py-32">
-      {/* The one section besides the hero that keeps the particle field. It closes the
-          page the way the hero opened it; on every section in between it was just noise. */}
-      <NeuronCanvas density={40} />
-
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
+    <section id="contact" className="border-b border-rule bg-surface py-16 sm:py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Say hello"
-          title="Get in"
-          accent="Touch"
-          description="Questions about joining, collaborating, or running an event with us? Send a message and we will get back to you."
-          align="center"
+          eyebrow="Get in touch"
+          title="Contact the association"
+          description="For questions about joining, collaborating on an event, or inviting the association to participate, write to us using the form below."
         />
 
         <div className="grid gap-6 lg:grid-cols-5">
-          <div className="space-y-3 lg:col-span-2">
-            {details.map((detail) => (
-              <a
-                key={detail.label}
-                href={detail.href}
-                target={detail.label === "Address" ? "_blank" : undefined}
-                rel={detail.label === "Address" ? "noopener noreferrer" : undefined}
-                className="card-surface group flex items-start gap-4 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-line2 hover:glow-sky"
-              >
-                <span
-                  aria-hidden
-                  className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-line2 bg-bg/60 text-sky"
-                >
-                  {detail.icon}
-                </span>
-                <span className="min-w-0">
-                  <span className="block font-mono text-[0.65rem] tracking-[0.15em] text-muted uppercase">
-                    {detail.label}
-                  </span>
-                  <span className="mt-1 block text-sm leading-relaxed break-words">
-                    {detail.value}
-                  </span>
-                </span>
-              </a>
-            ))}
+          {/* Address block first — the convention on an institutional contact page. */}
+          <div className="space-y-4 lg:col-span-2">
+            <div className="card p-6">
+              <h3 className="font-serif text-base font-bold text-ink">Association office</h3>
+              <dl className="mt-4 space-y-4 text-sm">
+                {settings?.address ? (
+                  <div>
+                    <dt className="text-[0.7rem] font-semibold tracking-[0.12em] text-muted uppercase">
+                      Address
+                    </dt>
+                    <dd className="mt-1 leading-relaxed text-ink">
+                      <a
+                        href={mapsHref(settings.address)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-navy2 hover:underline"
+                      >
+                        {settings.address}
+                      </a>
+                    </dd>
+                  </div>
+                ) : null}
+                {settings?.email ? (
+                  <div>
+                    <dt className="text-[0.7rem] font-semibold tracking-[0.12em] text-muted uppercase">
+                      Email
+                    </dt>
+                    <dd className="mt-1 break-all text-ink">
+                      <a href={`mailto:${settings.email}`} className="hover:text-navy2 hover:underline">
+                        {settings.email}
+                      </a>
+                    </dd>
+                  </div>
+                ) : null}
+                {settings?.phone ? (
+                  <div>
+                    <dt className="text-[0.7rem] font-semibold tracking-[0.12em] text-muted uppercase">
+                      Telephone
+                    </dt>
+                    <dd className="mt-1 text-ink">
+                      <a href={telHref(settings.phone)} className="hover:text-navy2 hover:underline">
+                        {settings.phone}
+                      </a>
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
 
-            {settings?.linkedin || settings?.instagram ? (
-              <div className="flex gap-3 pt-2">
-                {settings.linkedin ? (
-                  <a
-                    href={settings.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 rounded-xl border border-line bg-card/50 px-4 py-3 text-center text-xs font-semibold text-sky transition-colors hover:bg-sky/10"
-                  >
-                    LinkedIn
-                  </a>
-                ) : null}
-                {settings.instagram ? (
-                  <a
-                    href={settings.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 rounded-xl border border-line bg-card/50 px-4 py-3 text-center text-xs font-semibold text-sky transition-colors hover:bg-sky/10"
-                  >
-                    Instagram
-                  </a>
-                ) : null}
-              </div>
-            ) : null}
+              {settings?.linkedin || settings?.instagram ? (
+                <div className="mt-5 flex gap-2 border-t border-rule pt-4">
+                  {settings.linkedin ? (
+                    <a
+                      href={settings.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded border border-rule-strong px-3 py-1.5 text-xs font-semibold text-navy2 hover:bg-navy-tint"
+                    >
+                      LinkedIn
+                    </a>
+                  ) : null}
+                  {settings.instagram ? (
+                    <a
+                      href={settings.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded border border-rule-strong px-3 py-1.5 text-xs font-semibold text-navy2 hover:bg-navy-tint"
+                    >
+                      Instagram
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
           </div>
 
-          <div className="card-surface p-7 sm:p-8 lg:col-span-3">
+          <div className="card p-6 lg:col-span-3 sm:p-8">
             <form onSubmit={onSubmit} className="space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="c-name" className="mb-2 block text-xs font-semibold">
-                    Name <span className="text-rose">*</span>
+                  <label htmlFor="c-name" className="mb-1.5 block text-sm font-semibold text-ink">
+                    Name <span className="text-red">*</span>
                   </label>
                   <input id="c-name" name="name" required maxLength={160} className={FIELD} />
                 </div>
                 <div>
-                  <label htmlFor="c-email" className="mb-2 block text-xs font-semibold">
-                    Email <span className="text-rose">*</span>
+                  <label htmlFor="c-email" className="mb-1.5 block text-sm font-semibold text-ink">
+                    Email <span className="text-red">*</span>
                   </label>
                   <input
                     id="c-email"
@@ -162,21 +161,21 @@ export function Contact() {
               </div>
 
               <div>
-                <label htmlFor="c-subject" className="mb-2 block text-xs font-semibold">
+                <label htmlFor="c-subject" className="mb-1.5 block text-sm font-semibold text-ink">
                   Subject
                 </label>
                 <input id="c-subject" name="subject" maxLength={200} className={FIELD} />
               </div>
 
               <div>
-                <label htmlFor="c-message" className="mb-2 block text-xs font-semibold">
-                  Message <span className="text-rose">*</span>
+                <label htmlFor="c-message" className="mb-1.5 block text-sm font-semibold text-ink">
+                  Message <span className="text-red">*</span>
                 </label>
                 <textarea
                   id="c-message"
                   name="message"
                   required
-                  rows={5}
+                  rows={6}
                   maxLength={5000}
                   className={FIELD}
                 />
@@ -186,7 +185,7 @@ export function Contact() {
                 The honeypot. Hidden with inline styles rather than `hidden` or a utility
                 class: `display:none` on an input is the pattern bots specifically skip,
                 and a class name Tailwind might purge would expose the field to real users.
-                aria-hidden + tabIndex keeps it away from screen readers and the tab order.
+                aria-hidden + tabIndex keeps it out of the tab order and screen readers.
               */}
               <input
                 type="text"
@@ -203,13 +202,11 @@ export function Contact() {
                 </Button>
 
                 {/* role=status so the outcome is announced, not just shown. */}
-                <p role="status" className="text-xs">
+                <p role="status" className="text-sm">
                   {status.kind === "sent" ? (
-                    <span className="text-emerald">
-                      Thanks — we will get back to you soon.
-                    </span>
+                    <span className="text-green">Thank you — we will reply shortly.</span>
                   ) : status.kind === "failed" ? (
-                    <span className="text-rose">{status.message}</span>
+                    <span className="text-red">{status.message}</span>
                   ) : null}
                 </p>
               </div>

@@ -103,7 +103,7 @@ export function CommitteesPanel() {
         <ErrorNotice error={committees.error} onRetry={committees.reload} />
       ) : (
         <TableShell>
-          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Committee</th>
               <th className="px-4 py-3 text-start">Type</th>
@@ -113,7 +113,7 @@ export function CommitteesPanel() {
           </thead>
           <tbody>
             {list.map((committee, index) => (
-              <tr key={committee.id} className="border-t border-line">
+              <tr key={committee.id} className="border-t border-rule">
                 <td className="px-4 py-3">
                   <span aria-hidden className="me-2">
                     {committee.icon}
@@ -124,7 +124,7 @@ export function CommitteesPanel() {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge tone={committee.type === "executive" ? "gold" : "sky"}>
+                  <Badge tone={committee.type === "executive" ? "gold" : "navy"}>
                     {committee.type}
                   </Badge>
                 </td>
@@ -138,8 +138,7 @@ export function CommitteesPanel() {
                       disabled={busy || index === 0}
                       onClick={async () => {
                         const ok = await run(
-                          () => committeesApi.move(committee.id, "up"),
-                          "Order updated",
+                          () => committeesApi.move(committee.id, "up"),"Order updated",
                         );
                         if (ok) committees.reload();
                       }}
@@ -153,8 +152,7 @@ export function CommitteesPanel() {
                       disabled={busy || index === list.length - 1}
                       onClick={async () => {
                         const ok = await run(
-                          () => committeesApi.move(committee.id, "down"),
-                          "Order updated",
+                          () => committeesApi.move(committee.id, "down"),"Order updated",
                         );
                         if (ok) committees.reload();
                       }}

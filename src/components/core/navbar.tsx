@@ -3,35 +3,35 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SECTIONS, SITE } from "@/lib/site";
-import { cn } from "@/lib/utils";
+import { useSettings } from "@/lib/settings-context";
+import { cn, telHref } from "@/lib/utils";
 
 /**
- * The fixed navbar, with a scroll spy over the in-page sections.
+ * The site header: a utility bar, an institutional masthead, then the navigation.
  *
- * The spy uses IntersectionObserver rather than a scroll listener comparing offsets — the
- * approach the original used, which recomputed every section's position on every scroll
- * event and so ran hundreds of layout reads a second while scrolling.
+ * This three-band arrangement is the convention on essentially every college and
+ * university site, and it is convention for a good reason — it answers "whose site is
+ * this, and how do I contact them" before the visitor has scrolled at all. The previous
+ * header was a single floating translucent bar with a gradient logo tile, which told a
+ * visitor nothing and looked like a product landing page.
  */
 export function Navbar() {
+  const { settings } = useSettings();
   const [active, setActive] = useState<string>("home");
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        // The section nearest the top of the viewport wins, so a tall section does not
-        // hold the highlight while a short one is actually on screen.
+        // The section nearest the top wins, so a tall section does not hold the highlight
+        // while a short one is actually on screen.
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
         if (visible) setActive(visible.target.id);
       },
-      // Top inset matches the navbar height; bottom inset means a section only counts
-      // once it occupies the upper part of the viewport.
-      { rootMargin: "-70px 0px -55% 0px", threshold: 0 },
+      { rootMargin: "-96px 0px -55% 0px", threshold: 0 },
     );
-
     for (const section of SECTIONS) {
       const element = document.getElementById(section.id);
       if (element) observer.observe(element);
@@ -39,93 +39,104 @@ export function Navbar() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 h-nav border-b backdrop-blur-xl transition-colors",
-        scrolled ? "border-line bg-bg/90" : "border-transparent bg-bg/70",
-      )}
-    >
-      <nav
-        aria-label="Main"
-        className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6"
-      >
-        <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <span
-            aria-hidden
-            className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-sky to-violet font-display text-[0.6rem] leading-tight font-black text-bg"
-          >
-            AISA
-          </span>
-          <span className="leading-tight">
-            <span className="block font-display text-lg font-extrabold tracking-tight text-sky">
-              {SITE.name}
-            </span>
-            <span className="block text-[0.58rem] tracking-wider text-muted">
-              {SITE.longName}
-            </span>
-          </span>
-        </Link>
+    <header className="sticky top-0 z-50">
+      {/* Band 1 — contact details and the link up to the parent institute. */}
+      <div className="utility-bar hidden md:block">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-1.5 text-xs sm:px-6">
+          <div className="flex items-center gap-5">
+            {settings?.email ? (
+              <a href={`mailto:${settings.email}`} className="hover:text-white">
+                {settings.email}
+              </a>
+            ) : null}
+            {settings?.phone ? (
+              <a href={telHref(settings.phone)} className="hover:text-white">
+                {settings.phone}
+              </a>
+            ) : null}
+          </div>
+          <div className="flex items-center gap-5">
+            {settings?.website ? (
+              <a
+                href={settings.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                Institute website ↗
+              </a>
+            ) : null}
+            <Link href="/admin/" className="hover:text-white">
+              Admin
+            </Link>
+          </div>
+        </div>
+      </div>
 
-        <ul className="hidden items-center gap-1 lg:flex">
+      {/* Band 2 — the masthead. Association, department, institute, in that order. */}
+      <div className="border-b border-rule bg-page">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+          <Link href="/" className="flex items-center gap-3.5" onClick={() => setOpen(false)}>
+            <span
+              aria-hidden
+              className="flex size-11 shrink-0 items-center justify-center rounded-sm bg-navy font-serif text-[0.7rem] leading-none font-bold text-white"
+            >
+              AISA
+            </span>
+            <span className="leading-tight">
+              <span className="block font-serif text-lg font-bold text-ink sm:text-xl">
+                {SITE.longName}
+              </span>
+              <span className="block text-[0.72rem] text-muted">
+                {SITE.department} · {SITE.institute}
+              </span>
+            </span>
+          </Link>
+
+          <button
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="primary-nav"
+            aria-label="Toggle navigation"
+            className="rounded border border-rule-strong px-3 py-2 text-ink lg:hidden"
+          >
+            {open ? "✕" : "☰"}
+          </button>
+        </div>
+      </div>
+
+      {/* Band 3 — the navigation itself, on the institutional navy. */}
+      <nav aria-label="Main" className="hidden border-b border-navy3 bg-navy2 lg:block">
+        <ul className="mx-auto flex max-w-6xl items-stretch px-4 sm:px-6">
           {SECTIONS.map((section) => (
             <li key={section.id}>
               <a
                 href={`#${section.id}`}
                 aria-current={active === section.id ? "true" : undefined}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-semibold tracking-wider uppercase transition-colors",
+                className={cn("flex h-11 items-center border-b-[3px] px-4 text-[0.82rem] font-semibold tracking-wide text-white/85 transition-colors",
                   active === section.id
-                    ? "bg-sky/10 text-sky"
-                    : "text-muted hover:bg-sky/8 hover:text-sky",
+                    ? "border-gold bg-white/10 text-white"
+                    : "border-transparent hover:bg-white/10 hover:text-white",
                 )}
               >
                 {section.label}
               </a>
             </li>
           ))}
-          <li className="ms-2">
-            <Link
-              href="/admin/"
-              className="rounded-lg border border-line2 px-3 py-1.5 text-xs font-semibold tracking-wider text-sky uppercase transition-colors hover:bg-sky/10"
-            >
-              Admin
-            </Link>
-          </li>
         </ul>
-
-        <button
-          onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          aria-label="Toggle navigation"
-          className="rounded-md border border-line px-3 py-1.5 text-sky lg:hidden"
-        >
-          {open ? "✕" : "☰"}
-        </button>
       </nav>
 
       {/* `hidden` rather than conditional rendering, so the links stay in the DOM for
           in-page anchors and the panel does not remount on every toggle. */}
-      <div
-        id="mobile-nav"
-        hidden={!open}
-        className="border-t border-line bg-bg/97 backdrop-blur-xl lg:hidden"
-      >
-        <ul className="mx-auto max-w-6xl px-4 py-3">
+      <div id="primary-nav" hidden={!open} className="border-b border-rule bg-page lg:hidden">
+        <ul className="mx-auto max-w-6xl px-4 py-2 sm:px-6">
           {SECTIONS.map((section) => (
             <li key={section.id}>
               <a
                 href={`#${section.id}`}
                 onClick={() => setOpen(false)}
-                className="block rounded-md px-3 py-2.5 text-sm font-semibold tracking-wide text-muted uppercase hover:bg-sky/8 hover:text-sky"
+                className="block border-b border-rule py-3 text-sm font-semibold text-ink"
               >
                 {section.label}
               </a>
@@ -135,7 +146,7 @@ export function Navbar() {
             <Link
               href="/admin/"
               onClick={() => setOpen(false)}
-              className="block rounded-md px-3 py-2.5 text-sm font-semibold tracking-wide text-sky uppercase hover:bg-sky/8"
+              className="block py-3 text-sm font-semibold text-navy2"
             >
               Admin
             </Link>

@@ -81,24 +81,20 @@ export function Gallery() {
   const current = lightbox ? lightbox.items[lightbox.index] : null;
 
   return (
-    <section id="gallery" className="edge-top relative py-24 sm:py-32">
+    <section id="gallery" className="border-b border-rule py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-8">
-          <SectionHeading
-            eyebrow="Moments"
-            title="Photo"
-            accent="Gallery"
-            description="Workshops, competitions and everything in between."
-            className="mb-0"
-          />
-          <FilterTabs
-            label="Filter gallery"
-            options={FILTERS}
-            value={filter}
-            onChange={setFilter}
-            className="mb-0"
-          />
-        </div>
+        <SectionHeading
+          eyebrow="Gallery"
+          title="Photographs"
+          description="Workshops, competitions, guest lectures and departmental events."
+        />
+        <FilterTabs
+          label="Filter gallery"
+          options={FILTERS}
+          value={filter}
+          onChange={setFilter}
+          className="mb-8"
+        />
 
         {/*
           A mosaic, not a uniform grid. The first tile spans two columns and two rows, so
@@ -114,18 +110,15 @@ export function Gallery() {
             <ErrorNotice error={error} onRetry={reload} />
           ) : tiles.length === 0 ? (
             <EmptyState
-              icon="📸"
-              title="No photos yet"
-              hint="Photos from events appear here once the media committee uploads them."
+              title="No photographs published yet"
+              hint="Photographs from events appear here once the Media, Design & Publicity committee uploads them."
             />
           ) : (
             tiles.map(({ item, album }, index) => (
               <button
                 key={item.id}
                 onClick={() => setLightbox({ items: album ?? [item], index: 0 })}
-                className={cn(
-                  "group relative overflow-hidden rounded-xl border border-line",
-                  "transition-all duration-300 hover:border-line2 hover:glow-sky",
+                className={cn("group card card-hover relative overflow-hidden p-0",
                   index === 0 && "col-span-2 row-span-2",
                 )}
               >
@@ -137,18 +130,17 @@ export function Gallery() {
                 />
                 {/* The scrim is always on, not hover-only: a caption that appears only on
                     hover is invisible on a touch screen. */}
-                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg/70 to-transparent p-3 pt-8 text-start">
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy/90 to-transparent p-3 pt-8 text-start">
                   <span
-                    className={cn(
-                      "block truncate font-semibold",
-                      index === 0 ? "text-sm" : "text-[0.7rem]",
+                    className={cn("block truncate font-semibold text-white",
+                      index === 0 ? "text-sm" : "text-xs",
                     )}
                   >
                     {album ? item.albumTitle : item.title}
                   </span>
                 </span>
                 {album ? (
-                  <span className="absolute end-2 top-2 rounded-full border border-line2 bg-bg/85 px-2 py-0.5 font-mono text-[0.6rem] text-sky backdrop-blur">
+                  <span className="absolute end-2 top-2 rounded bg-navy/85 px-2 py-0.5 text-[0.65rem] font-semibold text-white">
                     {album.length} photos
                   </span>
                 ) : null}
@@ -164,18 +156,18 @@ export function Gallery() {
           aria-modal="true"
           aria-label={current.title}
           onClick={close}
-          className="fixed inset-0 z-70 flex flex-col items-center justify-center gap-5 bg-bg/96 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-70 flex flex-col items-center justify-center gap-5 bg-navy/95 p-4"
         >
           <img
             src={current.url}
             alt={current.title}
             onClick={(event) => event.stopPropagation()}
-            className="max-h-[72vh] max-w-full rounded-xl object-contain shadow-2xl"
+            className="max-h-[72vh] max-w-full rounded object-contain"
           />
           <div className="text-center">
-            <p className="font-display text-sm font-bold tracking-tight">{current.title}</p>
+            <p className="font-serif text-base font-bold text-white">{current.title}</p>
             {current.description ? (
-              <p className="mx-auto mt-1.5 max-w-lg text-xs text-muted">{current.description}</p>
+              <p className="mx-auto mt-1.5 max-w-lg text-sm text-white/70">{current.description}</p>
             ) : null}
           </div>
 
@@ -187,17 +179,17 @@ export function Gallery() {
               <button
                 onClick={() => step(-1)}
                 disabled={lightbox.index === 0}
-                className="rounded-lg border border-line2 px-4 py-2 text-sm text-sky transition-colors hover:bg-sky/10 disabled:opacity-30"
+                className="rounded border border-white/30 px-4 py-2 text-sm text-white transition-colors hover:bg-white/10 disabled:opacity-30"
               >
                 &larr; Prev
               </button>
-              <span className="font-mono text-xs text-muted tabular-nums">
+              <span className="text-xs text-white/70 tabular-nums">
                 {lightbox.index + 1} / {lightbox.items.length}
               </span>
               <button
                 onClick={() => step(1)}
                 disabled={lightbox.index === lightbox.items.length - 1}
-                className="rounded-lg border border-line2 px-4 py-2 text-sm text-sky transition-colors hover:bg-sky/10 disabled:opacity-30"
+                className="rounded border border-white/30 px-4 py-2 text-sm text-white transition-colors hover:bg-white/10 disabled:opacity-30"
               >
                 Next &rarr;
               </button>
@@ -207,7 +199,7 @@ export function Gallery() {
           <button
             onClick={close}
             aria-label="Close"
-            className="absolute end-4 top-4 rounded-lg border border-line2 bg-card/60 px-3 py-1.5 text-sky backdrop-blur transition-colors hover:bg-sky/10"
+            className="absolute end-4 top-4 rounded border border-white/30 px-3 py-1.5 text-white transition-colors hover:bg-white/10"
           >
             ✕
           </button>

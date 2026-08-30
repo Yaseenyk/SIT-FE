@@ -81,7 +81,7 @@ export function AchievementsPanel() {
         <ErrorNotice error={achievements.error} onRetry={achievements.reload} />
       ) : (
         <TableShell>
-          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Title</th>
               <th className="px-4 py-3 text-start">Student</th>
@@ -92,7 +92,7 @@ export function AchievementsPanel() {
           </thead>
           <tbody>
             {(achievements.data ?? []).map((item) => (
-              <tr key={item.id} className="border-t border-line">
+              <tr key={item.id} className="border-t border-rule">
                 <td className="px-4 py-3">{item.title}</td>
                 <td className="px-4 py-3 text-muted">{item.student}</td>
                 <td className="px-4 py-3 text-muted">{item.category}</td>
@@ -115,8 +115,7 @@ export function AchievementsPanel() {
                       disabled={busy}
                       onConfirm={async () => {
                         const ok = await run(
-                          () => achievementsApi.remove(item.id),
-                          "Achievement deleted",
+                          () => achievementsApi.remove(item.id),"Achievement deleted",
                         );
                         if (ok) achievements.reload();
                       }}

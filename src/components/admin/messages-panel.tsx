@@ -24,7 +24,7 @@ export function MessagesPanel() {
       ) : inbox.error ? (
         <ErrorNotice error={inbox.error} onRetry={inbox.reload} />
       ) : (inbox.data ?? []).length === 0 ? (
-        <p className="rounded-xl border border-dashed border-line px-6 py-12 text-center text-xs text-muted">
+        <p className="rounded-xl border border-dashed border-rule px-6 py-12 text-center text-xs text-muted">
           No messages yet.
         </p>
       ) : (
@@ -32,16 +32,16 @@ export function MessagesPanel() {
           {(inbox.data ?? []).map((message) => (
             <li
               key={message.id}
-              className={`card-surface p-5 ${message.read ? "opacity-70" : ""}`}
+              className={`card p-5 ${message.read ? "opacity-70" : ""}`}
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
                     {message.name}
-                    {!message.read ? <Badge tone="emerald">New</Badge> : null}
+                    {!message.read ? <Badge tone="green">New</Badge> : null}
                   </p>
                   <p className="mt-0.5 text-xs text-muted">
-                    <a href={`mailto:${message.email}`} className="hover:text-sky">
+                    <a href={`mailto:${message.email}`} className="hover:text-navy2">
                       {message.email}
                     </a>
                     {" · "}
@@ -63,7 +63,7 @@ export function MessagesPanel() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center rounded-lg border border-line2 px-3 py-1.5 text-xs text-sky hover:bg-sky/10"
+                    className="inline-flex items-center rounded-lg border border-rule-strong px-3 py-1.5 text-xs text-navy2 hover:bg-navy/10"
                   >
                     Reply
                   </a>
@@ -85,8 +85,7 @@ export function MessagesPanel() {
                     disabled={busy}
                     onConfirm={async () => {
                       const ok = await run(
-                        () => messagesApi.remove(message.id),
-                        "Message deleted",
+                        () => messagesApi.remove(message.id),"Message deleted",
                       );
                       if (ok) inbox.reload();
                     }}
@@ -95,7 +94,7 @@ export function MessagesPanel() {
               </div>
 
               {message.subject ? (
-                <p className="mt-3 text-xs font-semibold text-sky">{message.subject}</p>
+                <p className="mt-3 text-xs font-semibold text-navy2">{message.subject}</p>
               ) : null}
               {/* whitespace-pre-wrap: the message is stored exactly as typed, so the
                   paragraph breaks the sender made should survive to the screen. */}

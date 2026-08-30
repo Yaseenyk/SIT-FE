@@ -85,7 +85,7 @@ export function EventsPanel() {
         <ErrorNotice error={events.error} onRetry={events.reload} />
       ) : (
         <TableShell>
-          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Event</th>
               <th className="px-4 py-3 text-start">When</th>
@@ -95,7 +95,7 @@ export function EventsPanel() {
           </thead>
           <tbody>
             {(events.data ?? []).map((item) => (
-              <tr key={item.id} className="border-t border-line">
+              <tr key={item.id} className="border-t border-rule">
                 <td className="px-4 py-3">
                   <span aria-hidden className="me-2">
                     {item.emoji}
@@ -104,7 +104,7 @@ export function EventsPanel() {
                 </td>
                 <td className="px-4 py-3 font-mono text-xs text-muted">{item.dateLabel}</td>
                 <td className="px-4 py-3">
-                  <Badge tone={item.status === "upcoming" ? "emerald" : "muted"}>
+                  <Badge tone={item.status === "upcoming" ? "green" : "muted"}>
                     {item.status}
                   </Badge>
                 </td>
