@@ -1,13 +1,13 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState, type FormEvent } from "react";
 import { Button, ErrorNotice } from "@/components/ui/interactive";
-import { Skeleton } from "@/components/ui/primitives";
+import { Fact, Skeleton } from "@/components/ui/primitives";
 import { settings as settingsApi } from "@/lib/api/endpoints";
 import { useApi } from "@/lib/hooks/use-api";
 import { useAuth } from "@/lib/auth/context";
-import { auth as authApi } from "@/lib/api/endpoints";
-import { setAuthToken } from "@/lib/api/client";
 import { FIELD, Field, Notice, Panel, useActionState } from "./shared";
 
 export function SettingsPanel() {
@@ -175,7 +175,7 @@ export function SettingsPanel() {
 
 /** The announcement bar, and the admin's own credentials. */
 export function AccountPanel() {
-  const { setUsername, signOut } = useAuth();
+  const { me, signOut, sendReset } = useAuth();
   const data = useApi(() => settingsApi.get(), []);
   const announcement = useActionState();
   const credentials = useActionState();
@@ -264,89 +264,45 @@ export function AccountPanel() {
           </Notice>
         ) : null}
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <form
-            className="space-y-4"
-            onSubmit={async (event) => {
-              event.preventDefault();
-              const form = new FormData(event.currentTarget);
-              const ok = await credentials.run(
-                () =>
-                  authApi.changePassword(
-                    String(form.get("currentPassword") ?? ""),
-                    String(form.get("newPassword") ?? ""),
-                  ),"Password changed",
-              );
-              if (ok) event.currentTarget?.reset();
-            }}
-          >
-            <h3 className="font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
-              Change password
-            </h3>
-            <Field label="Current password" htmlFor="cp-current" required>
-              <input
-                id="cp-current"
-                name="currentPassword"
-                type="password"
-                required
-                autoComplete="current-password"
-                className={FIELD}
-              />
-            </Field>
-            <Field label="New password" htmlFor="cp-new" required hint="At least 10 characters.">
-              <input
-                id="cp-new"
-                name="newPassword"
-                type="password"
-                required
-                minLength={10}
-                autoComplete="new-password"
-                className={FIELD}
-              />
-            </Field>
-            <Button type="submit" disabled={credentials.busy}>
-              Change password
-            </Button>
-          </form>
+        {/*
+          There is no change-password form here any more, and no change-username form at
+          all: Firebase owns credentials now, and the account is identified by email
+          address rather than by a username this API could rename.
 
-          <form
-            className="space-y-4"
-            onSubmit={async (event) => {
-              event.preventDefault();
-              const form = new FormData(event.currentTarget);
-              const ok = await credentials.run(async () => {
-                const response = await authApi.changeUsername(
-                  String(form.get("currentPassword") ?? ""),
-                  String(form.get("newUsername") ?? ""),
-                );
-                // The server reissues the token because the old one still names the old
-                // username in its claims. Store it, or the next request signs us out.
-                setAuthToken(response.token);
-                setUsername(response.username);
-              }, "Username changed");
-              if (ok) event.currentTarget?.reset();
+          A reset link rather than an in-page password form is not laziness. Firebase
+          requires a RECENT sign-in to change a password directly, so an in-page form fails
+          for anyone whose session is more than a few minutes old — with an error they can
+          do nothing about. The emailed link always works.
+        */}
+        <dl className="mb-7 max-w-md">
+          <Fact label="Signed in as">{me?.email ?? "—"}</Fact>
+          <Fact label="Name">{me?.name ?? "—"}</Fact>
+          <Fact label="Role">Administrator</Fact>
+          <Fact label="Last sign-in">
+            {me?.lastLoginAt ? new Date(me.lastLoginAt).toLocaleString("en-IN") : "—"}
+          </Fact>
+        </dl>
+
+        <div className="flex flex-wrap gap-3">
+          <Button
+            disabled={credentials.busy || !me?.email}
+            onClick={async () => {
+              if (!me?.email) return;
+              await credentials.run(
+                () => sendReset(me.email as string),
+                `Password reset link sent to ${me.email}.`,
+              );
             }}
           >
-            <h3 className="font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
-              Change username
-            </h3>
-            <Field label="Password" htmlFor="cu-current" required>
-              <input
-                id="cu-current"
-                name="currentPassword"
-                type="password"
-                required
-                autoComplete="current-password"
-                className={FIELD}
-              />
-            </Field>
-            <Field label="New username" htmlFor="cu-new" required>
-              <input id="cu-new" name="newUsername" required minLength={3} className={FIELD} />
-            </Field>
-            <Button type="submit" disabled={credentials.busy}>
-              Change username
-            </Button>
-          </form>
+            Email me a password reset link
+          </Button>
+
+          <Link
+            href="/account/"
+            className="inline-flex items-center rounded-lg border border-rule-strong px-4 py-2 text-sm font-semibold text-ink"
+          >
+            Edit my profile
+          </Link>
         </div>
 
         <div className="mt-8 border-t border-rule pt-6">

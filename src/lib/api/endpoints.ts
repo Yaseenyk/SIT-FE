@@ -8,6 +8,7 @@
 import { API_V1, api } from "./client";
 import type {
   Achievement,
+  ApplicationSummary,
   AdminSettings,
   AdminStats,
   AisaEvent,
@@ -15,28 +16,70 @@ import type {
   ContactMessage,
   EventStatus,
   GalleryItem,
-  LoginResponse,
+  Me,
   Member,
+  MyApplication,
+  MyRegistration,
   PublicStats,
+  RegistrationSummary,
   SiteSettings,
   UploadSignature,
+  UserSummary,
 } from "@/types/api";
 
 const path = (segment: string) => `${API_V1}${segment}`;
 
 export const auth = {
-  login: (username: string, password: string) =>
-    // anonymous: sending a stale token with a login request makes the server answer 401
-    // and clear it, which looks to the admin like their correct password was rejected.
-    api.post<LoginResponse>(path("/auth/login"), { username, password }, { anonymous: true }),
+  /**
+   * Completes signup for a caller who already holds a Firebase credential.
+   *
+   * There is no login or password call anywhere in this file — the browser talks to
+   * Firebase for credentials and to this API for everything else, so nothing here can
+   * see a password.
+   */
+  register: (body: { name: string; rollNumber: string | null; year: number | null }) =>
+    api.post<Me>(path("/auth/register"), body),
 
-  me: () => api.get<{ username: string; lastLoginAt: string | null }>(path("/auth/me")),
+  me: () => api.get<Me>(path("/auth/me")),
 
-  changePassword: (currentPassword: string, newPassword: string) =>
-    api.post<void>(path("/auth/change-password"), { currentPassword, newPassword }),
+  /** Same shape as me(), and also stamps lastLoginAt. Called once per session. */
+  session: () => api.post<Me>(path("/auth/session")),
 
-  changeUsername: (currentPassword: string, newUsername: string) =>
-    api.post<LoginResponse>(path("/auth/change-username"), { currentPassword, newUsername }),
+  updateProfile: (body: {
+    name: string;
+    rollNumber: string | null;
+    year: number | null;
+    photoUrl: string | null;
+    photoPublicId: string | null;
+  }) => api.put<Me>(path("/auth/profile"), body),
+};
+
+export const users = {
+  list: () => api.get<UserSummary[]>(path("/admin/users")),
+  update: (uid: string, body: { role?: string; status?: string }) =>
+    api.patch<UserSummary>(path(`/admin/users/${uid}`), body),
+  remove: (uid: string) => api.delete<void>(path(`/admin/users/${uid}`)),
+};
+
+export const registrations = {
+  register: (eventId: string) =>
+    api.post<MyRegistration>(path(`/events/${eventId}/registration`)),
+  cancel: (eventId: string) => api.delete<void>(path(`/events/${eventId}/registration`)),
+  mine: () => api.get<MyRegistration[]>(path("/me/registrations")),
+  forEvent: (eventId: string) =>
+    api.get<RegistrationSummary[]>(path(`/events/${eventId}/registrations`)),
+};
+
+export const applications = {
+  apply: (body: { committeeId: string; motivation: string }) =>
+    api.post<MyApplication>(path("/applications"), body),
+  mine: () => api.get<MyApplication[]>(path("/me/applications")),
+  withdraw: (id: string) => api.delete<void>(path(`/me/applications/${id}`)),
+
+  list: (status?: string) =>
+    api.get<ApplicationSummary[]>(path("/applications"), { query: { status } }),
+  review: (id: string, body: { status: "ACCEPTED" | "REJECTED"; role?: string }) =>
+    api.patch<ApplicationSummary>(path(`/applications/${id}`), body),
 };
 
 export const committees = {
@@ -116,7 +159,13 @@ export const stats = {
   getForAdmin: () => api.get<AdminStats>(path("/stats/admin")),
 };
 
-export type UploadFolder = "gallery" | "members" | "events" | "achievements" | "committees";
+export type UploadFolder =
+  | "gallery"
+  | "members"
+  | "events"
+  | "achievements"
+  | "committees"
+  | "avatars";
 
 export const media = {
   sign: (folder: UploadFolder) => api.post<UploadSignature>(path("/media/signature"), { folder }),

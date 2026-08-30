@@ -13,46 +13,42 @@ export const API_BASE_URL =
 export const API_V1 = "/api/v1";
 
 /**
- * Session token, held in module scope and mirrored to localStorage.
+ * How a request gets its credential.
  *
- * Module scope so every request picks it up without threading it through each call site;
- * localStorage so a refresh does not sign the admin out mid-edit.
+ * The token is PULLED from a provider rather than pushed in and stored. Firebase ID
+ * tokens last an hour and are refreshed in the background, so a token captured once at
+ * sign-in is stale by the time a tab left open makes its next request; asking for it per
+ * request means `getIdToken()` hands back a fresh one and nothing here has to track
+ * expiry, refresh, or revocation.
  *
- * localStorage is readable by any script on this origin, which is the accepted trade for a
- * static site with no server to set an HttpOnly cookie. The mitigations that make it
- * defensible: the token expires in 12 hours, it grants nothing a signed-in admin could not
- * already do, and rotating JWT_SECRET on the server revokes every issued token at once.
+ * It also means this module holds no credential at all. The previous build kept a JWT in
+ * localStorage — readable by any script on the origin — and documented that as an accepted
+ * trade for a static site. Firebase keeps its refresh token in IndexedDB and issues
+ * short-lived access tokens instead, so the trade no longer has to be made.
+ *
+ * `AuthProvider` installs the provider on mount. Before that, and for a signed-out
+ * visitor, it returns null and requests go out anonymously — which is exactly right, since
+ * every public GET must work with no account at all.
  */
-const TOKEN_KEY = "aisa.token";
-let authToken: string | null = null;
+type TokenProvider = () => Promise<string | null>;
 
-export function setAuthToken(token: string | null): void {
-  authToken = token;
-  if (typeof window === "undefined") return;
+let tokenProvider: TokenProvider | null = null;
+
+export function setTokenProvider(provider: TokenProvider | null): void {
+  tokenProvider = provider;
+}
+
+async function currentToken(): Promise<string | null> {
+  if (!tokenProvider) return null;
   try {
-    if (token) {
-      window.localStorage.setItem(TOKEN_KEY, token);
-    } else {
-      window.localStorage.removeItem(TOKEN_KEY);
-    }
+    return await tokenProvider();
   } catch {
-    // Private mode, or storage disabled. The token still works for this tab from
-    // module scope; it simply will not survive a reload.
+    // A refresh that fails (offline, revoked account) is a signed-out request, not a
+    // crash. The server answers 401 and the app shows the sign-in screen.
+    return null;
   }
 }
 
-export function getAuthToken(): string | null {
-  if (authToken) return authToken;
-  if (typeof window === "undefined") return null;
-  try {
-    authToken = window.localStorage.getItem(TOKEN_KEY);
-  } catch {
-    authToken = null;
-  }
-  return authToken;
-}
-
-/** Fired when the server rejects our token, so the app can show the login screen. */
 export const AUTH_EXPIRED_EVENT = "aisa:auth-expired";
 
 const DEFAULT_TIMEOUT_MS = 20_000;
@@ -128,7 +124,7 @@ async function toApiError(response: Response): Promise<ApiError> {
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { query, body, timeoutMs = DEFAULT_TIMEOUT_MS, headers, anonymous, ...rest } = options;
 
-  const token = anonymous ? null : getAuthToken();
+  const token = anonymous ? null : await currentToken();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
@@ -155,7 +151,8 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
        * dashboard panel inventing its own recovery.
        */
       if (response.status === 401 && typeof window !== "undefined") {
-        setAuthToken(null);
+        // Nothing to clear: Firebase owns the session. This only tells the app to show
+        // the sign-in screen rather than leaving every panel to invent its own recovery.
         window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
       }
       throw await toApiError(response);

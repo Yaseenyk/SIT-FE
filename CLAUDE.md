@@ -1,145 +1,255 @@
-# CLAUDE.md — SIT-FE
+# CLAUDE.md — AISA
 
-AI guardrails for this repository. Binding for every code generation, refactor and review.
-When a rule here conflicts with a general habit, this file wins.
-
----
-
-## 0. What this is
-
-The public website and admin UI for **AISA**, the AIML Student Association at BSIET
-Kolhapur. Next.js (App Router) + TypeScript + Tailwind v4, **static export** to GitHub Pages.
-
-The API is a separate repository: [Yaseenyk/SIT-BE](https://github.com/Yaseenyk/SIT-BE).
-
-**The constraint that shapes everything:** GitHub Pages serves static files. There is no
-Node process — no SSR, no route handlers, no image optimiser. Every piece of
-admin-editable content is fetched in the browser at runtime.
+AI guardrails for this repository. These rules are binding for every code generation,
+refactor, and review in this project. When a rule here conflicts with a general habit,
+this file wins.
 
 ---
 
-## 1. No secrets. Ever.
+## 0. Project identity
 
-**Anything named `NEXT_PUBLIC_*` is compiled into the JavaScript the browser downloads.**
-It is not a secret and never can be.
+**AISA** — the AIML Student Association site for the Department of CSE (AI & ML),
+Dr. Bapuji Salunkhe Institute of Engineering & Technology, Kolhapur.
 
-If you find yourself wanting a secret here — a database URL, an API key, a signing key —
-the work belongs in SIT-BE. There is no exception.
+Two deployables, one repository:
 
-**Nothing in this repo is a security boundary.** `AdminGate` decides which screen to show,
-not what anyone is allowed to do. Never move a check here and delete the server-side one.
+| Directory | What it is | Where it runs |
+| --------- | ---------- | ------------- |
+| `fe/` | Next.js (App Router) + TypeScript + Tailwind v4, **static export** | GitHub Pages |
+| `be/` | Spring Boot 3 + Java 25 + **Cloud Firestore** + **Firebase Auth** | Render (Docker) |
 
-The token lives in `localStorage`. That is a considered trade for a static site with no
-server to set an HttpOnly cookie — see the comment in `lib/api/client.ts`. Do not "fix" it
-by inventing a cookie the static host cannot set.
+It replaces a single 4,019-line `AISA_Website .html` that called Firebase (Firestore,
+Auth, Storage) directly from the browser. Read `docs/architecture.md` before changing
+anything structural — it records what moved where, and why.
+
+**The one constraint that shapes everything:** GitHub Pages serves static files. There is
+no Node process on the frontend and no server-side rendering of content. Every piece of
+admin-editable content is fetched in the browser from the Java API.
 
 ---
 
-## 2. Design tokens are mandatory
+## 1. The security model (hard rule)
 
-The palette is declared once in `src/app/globals.css` under `@theme`.
+**Public reads. Students act on their own behalf. Admins do everything else.
+Enforced on the server, nowhere else.**
+
+- Authorisation lives in `be/.../config/SecurityConfig.java` as *rules*, not as
+  annotations sprinkled across controllers. A rule you cannot see in that one file does
+  not exist. Do not add `@PreAuthorize` to individual handlers as a substitute.
+- `SecurityRulesIntegrationTest` is the test that must never be weakened. Adding an
+  endpoint means adding its case there. A write endpoint reachable anonymously is the
+  worst bug this project can ship, and it throws no exception.
+- **Nothing in `fe/` is a security boundary.** `AdminGate` decides which screen to show,
+  not what anyone is allowed to do. Never move a check into the client and delete the
+  server-side one.
+- **Identity is Firebase Auth; authorisation is ours.** Firebase answers "who is this";
+  `SecurityConfig` answers "what may they do". Never move an authorisation decision into
+  Firebase custom claims or into the client — that is precisely what the original
+  single-file site did wrong.
+- **Signing up can only ever produce a STUDENT.** `UserService.register` assigns the role
+  and ignores anything the client sends. A public form that can grant admin is the same
+  bug as an unauthenticated write endpoint. The first admin comes from `ADMIN_EMAIL` /
+  `ADMIN_PASSWORD` at boot; every later one is promoted by an existing admin.
+- **No token is stored by us.** The API client pulls a fresh Firebase ID token per request
+  (`setTokenProvider` in `lib/api/client.ts`); Firebase keeps its refresh token in
+  IndexedDB. Do not reintroduce a token in `localStorage`.
+- A valid token is not permission. `FirebaseAuthenticationFilter` grants one of
+  `ROLE_UNREGISTERED`, `ROLE_UNVERIFIED`, `ROLE_SUSPENDED`, `ROLE_STUDENT`, `ROLE_ADMIN`,
+  and `MeResponse.state` reports the same thing to the client. **The client must never
+  re-derive that state** — it did once, drifted immediately, and a refused signup showed
+  as a successful one.
+
+### Secrets
+
+- Every secret lives in `be/.env` (git-ignored) and in the host's environment. Nowhere
+  else. `be/.env.example` documents each one and is the file you update when adding a new
+  one.
+- **Anything named `NEXT_PUBLIC_*` is compiled into the JavaScript the browser downloads.**
+  It is not a secret and never can be. If you find yourself wanting a secret in `fe/`, the
+  work belongs in `be/`.
+- The old file had a live Firebase API key committed in it. Do not reintroduce that
+  pattern for any provider.
+
+---
+
+## 2. Frontend rules
+
+### Design tokens are mandatory
+
+The palette is a straight port of the original site's CSS custom properties, declared once
+in `src/app/globals.css` under `@theme`.
 
 ```tsx
 // ❌ never
-<span className="text-[#38bdf8]">Events</span>
-<div style={{ background: "#071e30" }} />
+<span className="text-[#b3861a]">Events</span>
+<div style={{ background: "#07294d" }} />
 
 // ✅ always
-<span className="text-sky">Events</span>
-<div className="bg-card" />
+<span className="text-gold">Events</span>
+<div className="bg-navy" />
 ```
 
-- Surfaces: `bg`, `bg2`, `surface`, `card`, `card2`
-- Accent: `sky`, `sky2`, `sky3`, `cyan` — `sky` means *interactive*
-- Status: `emerald`, `gold`, `rose` — **semantic only**, never decorative, and the brand is
-  never used for status
-- Text and lines: `ink`, `muted`, `line`, `line2`
-- Type: `font-display` (Orbitron) headings, `font-sans` (Exo 2) body, `font-mono`
-  (JetBrains Mono) numbers and labels
+- Surfaces: `page` (warm off-white, never `#fff`), `surface`, `sunken`, `paper` (cards).
+- Structure: `navy-deep`, `navy`, `navy2`, `navy3`, `navy-tint`.
+- Accent: `gold`, `gold-bright` (on navy only), `gold-soft`; `clay` / `clay-soft` as the
+  third colour where navy-and-gold alone becomes monotonous.
+- Status, semantic only: `green`, `amber`, `red` and their `-soft` pairs.
+- Text and rules: `ink`, `body`, `muted`, `rule`, `rule-strong`.
+- Elevation is a scale, not one shadow: `shadow-raise`, `shadow-lift`, `shadow-float`.
+- Fonts: `font-serif` (Source Serif) for headings, `font-sans` (Inter) for body,
+  `font-mono` for numbers and labels.
+- Composed classes in `globals.css`: `.card`, `.card-hover`, `.band-navy`, `.pattern-dots`,
+  `.image-placeholder`, `.image-scrim`, `.reveal`, `.section-rule`.
 
-**The two documented exceptions** are `committee.gradient` and the hero's radial wash —
-per-record admin values and one-off art direction, so they can only be inline styles.
-Anything else reaching for `style={{}}` is a mistake.
-
-If a value has no token, **propose a token** rather than using an arbitrary value.
-
-### Never build a class name from a variable
-
-Tailwind scans source *text*. `bg-${tone}/10` is not in the output CSS and renders
-unstyled. Use a full-string lookup map, as `Badge` does.
+- **The two documented exceptions** are `committee.gradient` and the hero's radial wash:
+  both are per-record values authored by an admin or one-off art direction, so they can
+  only be inline styles. Everything else that reaches for `style={{}}` is a mistake.
+- **Two failed directions are recorded at the top of `globals.css`. Read them.** The first
+  build looked machine-generated (gradient headings, glow, particles); stripping all of it
+  produced a page that looked like a government form. Depth, warmth and pictures are what
+  fixed it — not ornament.
+- If a value you need genuinely has no token, **propose a token** rather than reaching for
+  an arbitrary value.
 
 ### Tailwind only scans `src/`
 
-`globals.css` pins it: `@import "tailwindcss" source(none);` + `@source "../../src";`.
+`globals.css` pins the scan with `@import "tailwindcss" source(none);` + `@source "../../src";`.
 Tailwind v4 otherwise scans the whole project, sweeps up this file and `docs/*.md` — which
-*name* utility classes while discussing them — and compiles them into the bundle.
-**Do not remove that pair.**
+*name* utility classes while discussing them — and compiles them into the bundle. **Do not
+remove that pair.**
 
----
+### Never build a class name from a variable
 
-## 3. Layout and rhythm
+Tailwind scans source text. `bg-${tone}/10` is not in the output CSS and renders unstyled.
+Use a full-string lookup map, as `Badge` in `components/ui/primitives.tsx` does.
 
-Seven identically-centred sections read as one undifferentiated column; that is most of
-why the first version looked unfinished. So:
+### RSC by default
 
-- `SectionHeading` defaults to **left-aligned**. Centre only genuinely symmetrical sections.
-- Sections alternate `bg` / `bg2` and carry `edge-top`.
-- Vary the shape: Events is a list with a featured lead, Gallery is a mosaic with a 2×2
-  lead tile, About is a two-column split. **Do not flatten these back into uniform grids.**
-- The particle canvas is on the **hero and contact only**. On every section it was noise.
-
----
-
-## 4. RSC by default
-
-- Every component is a Server Component until proven otherwise. `"use client"` goes at the
-  lowest leaf that needs it.
-- `app/page.tsx` is composition only and stays a Server Component.
-- Sections are client components because they fetch at runtime. That is inherent to a
-  static export, not laziness — do not "fix" it by fetching in `page.tsx`; there is no
+- Every component is a Server Component until proven otherwise. `"use client"` belongs at
+  the lowest leaf that actually needs it.
+- `app/page.tsx` is and stays a Server Component: it is composition only.
+- Sections are client components because they fetch at runtime — that is inherent to a
+  static export, not laziness. Do not "fix" it by fetching in `page.tsx`; there is no
   server to fetch on.
-- `components/ui/primitives.tsx` is server-only, `interactive.tsx` is client. Keep that
-  split, so importing a `Card` does not drag `"use client"` along with it.
 
----
-
-## 5. Data fetching
+### Data fetching
 
 - Components never build a URL. Every call goes through `lib/api/endpoints.ts`.
-- Every fetch goes through `useApi`, which gives loading / error / retry.
-- **Loading and failure are normal, reachable states** here — the free-tier API sleeps and
-  takes ~50 s to wake. A section that renders nothing on failure is incomplete work.
-- `useApi` deps must be **primitives**; they are joined into a string key.
+- Every fetch goes through `useApi`, which gives loading / error / retry. Loading and
+  failure are **normal reachable states** here (the free-tier API sleeps), not edge cases.
+  A section that renders nothing on failure is incomplete work.
+- `useApi` deps must be **primitives**. They are joined into a string key.
 
----
-
-## 6. Accessibility
+### Accessibility
 
 - One `<h1>` per page (the hero). Heading levels never skip.
-- Real `<button>` and `<a>` elements, keyboard-operable. A `<div onClick>` is a bug.
-- Decorative canvases and emoji get `aria-hidden`.
-- `:focus-visible` is a visible `sky` outline. **Never removed.**
-- `prefers-reduced-motion` is honoured globally and specifically in `NeuronCanvas`.
-- Async outcomes are announced: `role="status"` for success, `role="alert"` for errors.
+- Every interactive element is a real `<button>` or `<a>` and is keyboard-operable.
+  A `<div onClick>` is a bug.
+- Decorative canvases and icons get `aria-hidden`.
+- `prefers-reduced-motion` is honoured — `globals.css` kills every animation AND forces
+  `.reveal` visible. A reveal that animates from `opacity: 0` and never runs is a section
+  nobody can read, so the override is not optional.
 
 ---
 
-## 7. Working agreement
+## 3. Backend rules
 
-- **Surgical changes only.** No drive-by refactors, no speculative abstractions.
-- **Comments explain *why*, never *what*.** Every comment here records a decision, a
-  constraint, or the bug the obvious alternative would cause. Match that bar.
-- **Verify before claiming done.** If you cannot run something, say so plainly.
+### Firestore has no schema, so the code is the schema
+
+- There are no migrations, because there is nothing to migrate. Every document is mapped
+  by hand in a repository (`toX` / `toMap`), never by the SDK's reflective POJO mapper —
+  which reads `null` for a renamed field instead of failing, and `null` is legitimate for
+  most fields here, so nothing would surface until a page rendered blank.
+- **Firestore has no cascade and no foreign keys.** Deleting anything means deleting what
+  pointed at it, in the same service method, and `ReferentialIntegrityTest` is what proves
+  it. A new collection that references another means wiring that path too.
+- Derived fields used by queries (`Event.lastDay`) are written on EVERY save, or a query
+  silently misses documents saved before the field existed.
+
+### Layering
+
+`Controller` → `Service` → `Repository`. Controllers do routing, validation
+(`@Valid`) and status codes; they contain no business logic. Services own transactions.
+
+### Never serialise an entity
+
+Controllers return DTOs (`*Dtos.java` or a record nested in the service). Returning an
+entity leaks admin-only columns — the Cloudinary `public_id` fields, the notification
+email — and couples the JSON shape to column names.
+
+### Errors
+
+One shape, from `GlobalExceptionHandler`. Throw `NotFoundException`, `ConflictException`,
+`RateLimitedException`, or `IllegalArgumentException` and let it map. Never build an error
+body in a controller. Never let a stack trace reach the client.
+
+### Validation at the boundary
+
+Bean Validation on the request record. Business rules that a constraint cannot express
+(an end date before a start date) are checked in the service with a readable message,
+*and* backed by a database constraint. Not in between.
 
 ---
 
-## 8. Definition of done
+## 4. Images
 
+Uploads go **browser → Cloudinary**, signed by `POST /api/v1/media/signature`. The bytes
+never pass through the API.
+
+- The API secret never reaches the browser.
+- The resize is inside the signed transformation, so a client cannot skip it.
+- Deleting a record deletes its image (`MediaService.deleteQuietly`). Replacing an image
+  releases the old one. **A new image field means wiring both paths** — otherwise orphaned
+  assets accumulate where nobody will ever find them.
+- `deleteQuietly` logs rather than throws, on purpose: a failed remote cleanup must not
+  fail the admin's delete.
+
+---
+
+## 5. Documentation is part of the change
+
+- `docs/architecture.md` — what moved from the HTML file, the data model, the request flow
+- `docs/deployment.md` — Pages + Render, and every environment variable
+- `docs/ui-system.md` — the token table and the component inventory
+
+**Read the relevant doc before touching an area. Update it in the same change that makes
+it stale.** A change to the API contract that leaves `docs/architecture.md` describing the
+old shape is not done.
+
+---
+
+## 6. Working agreement
+
+- **Surgical changes only.** Touch what the task requires. No drive-by refactors, no
+  speculative abstractions.
+- **Comments explain *why*, never *what*.** The code already says what it does. Every
+  comment in this codebase earns its place by recording a decision, a constraint, or a bug
+  that the obvious alternative would cause — several record what the original single-file
+  site got wrong. Match that bar.
+- **No speculative error handling.** Validate at real boundaries — user input, the API,
+  Cloudinary. Not in between.
+- **Verify before claiming done.** If you cannot run something, say so plainly instead of
+  implying success.
+
+---
+
+## 7. Definition of done
+
+**Frontend**
 - [ ] `npm run typecheck`, `npm run lint`, `npm test`, `npm run build` all pass
 - [ ] Only design tokens; zero arbitrary colour values
-- [ ] `"use client"` only where needed, at the leaf
+- [ ] `"use client"` only where genuinely needed, at the leaf
 - [ ] Loading, error and empty states all handled
 - [ ] Semantic HTML; single `h1`; keyboard-operable
-- [ ] Checked at 390 px — no horizontal overflow
-- [ ] `docs/ui-system.md` updated if components or tokens changed
-- [ ] No secret added anywhere in this repo
+
+**Backend**
+- [ ] `mvn verify` passes — needs BOTH emulators:
+      `npx firebase-tools emulators:start --only firestore,auth` (from `be/`)
+- [ ] Deleting a record deletes what referenced it — Firestore has no cascade
+- [ ] New endpoints have a case in `SecurityRulesIntegrationTest`
+- [ ] DTOs in, DTOs out — no entity crosses the controller boundary
+- [ ] New config is in `.env.example` **and** `docs/deployment.md`
+
+**Both**
+- [ ] Affected `docs/` updated in the same change
+- [ ] No secret added to `fe/`, and none committed anywhere

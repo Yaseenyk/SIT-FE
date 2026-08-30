@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SECTIONS, SITE } from "@/lib/site";
+import { useAuth } from "@/lib/auth/context";
 import { useSettings } from "@/lib/settings-context";
 import { cn, telHref } from "@/lib/utils";
 
@@ -67,9 +68,7 @@ export function Navbar() {
                 Institute website ↗
               </a>
             ) : null}
-            <Link href="/admin/" className="hover:text-white">
-              Admin
-            </Link>
+            <AccountLink className="hover:text-white" />
           </div>
         </div>
       </div>
@@ -143,16 +142,48 @@ export function Navbar() {
             </li>
           ))}
           <li>
-            <Link
-              href="/admin/"
-              onClick={() => setOpen(false)}
+            <AccountLink
+              onNavigate={() => setOpen(false)}
               className="block py-3 text-sm font-semibold text-navy2"
-            >
-              Admin
-            </Link>
+            />
           </li>
         </ul>
       </div>
     </header>
+  );
+}
+
+/**
+ * The one link in the header that changes with who is looking.
+ *
+ * <p>It used to say "Admin" for everybody, which pointed the overwhelming majority of
+ * visitors — students — at a dashboard they cannot open. Now it offers the door that is
+ * actually theirs: sign in, their account, or the dashboard if they run the site.
+ */
+function AccountLink({
+  className,
+  onNavigate,
+}: {
+  className?: string;
+  onNavigate?: () => void;
+}) {
+  const { state, isAdmin, me } = useAuth();
+
+  // Nothing at all until the session is known. A link that says "Sign in" for a moment
+  // and then becomes the person's own name is worse than one that arrives a beat late.
+  if (state === "loading") return null;
+
+  if (state === "signed-out") {
+    return (
+      <Link href="/login/" onClick={onNavigate} className={className}>
+        Sign in
+      </Link>
+    );
+  }
+
+  return (
+    <Link href={isAdmin ? "/admin/" : "/account/"} onClick={onNavigate} className={className}>
+      {isAdmin ? "Dashboard" : (me?.name?.split(" ")[0] ?? "My account")}
+    </Link>
   );
 }

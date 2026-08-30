@@ -3,7 +3,10 @@
 import { useState, type FormEvent } from "react";
 import { Button, ErrorNotice, Modal } from "@/components/ui/interactive";
 import { Badge, Skeleton } from "@/components/ui/primitives";
-import { events as eventsApi } from "@/lib/api/endpoints";
+import {
+  events as eventsApi,
+  registrations as registrationsApi,
+} from "@/lib/api/endpoints";
 import { useApi } from "@/lib/hooks/use-api";
 import type { AisaEvent } from "@/types/api";
 import {
@@ -27,6 +30,7 @@ export function EventsPanel() {
     bannerPublicId: string | null;
   } | null>(null);
   const [editing, setEditing] = useState<AisaEvent | null>(null);
+  const [attendeesFor, setAttendeesFor] = useState<AisaEvent | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -110,6 +114,9 @@ export function EventsPanel() {
                 </td>
                 <td className="px-4 py-3">
                   <span className="flex justify-end gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => setAttendeesFor(item)}>
+                      Attendees
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -134,6 +141,8 @@ export function EventsPanel() {
           </tbody>
         </TableShell>
       )}
+
+      <AttendeesModal event={attendeesFor} onClose={() => setAttendeesFor(null)} />
 
       <Modal
         open={draft !== null}
@@ -242,5 +251,102 @@ export function EventsPanel() {
         </form>
       </Modal>
     </Panel>
+  );
+}
+
+/**
+ * Who has signed up for one event.
+ *
+ * <p>Exists because a registration nobody can read is not a feature. The copy button is
+ * the point of it in practice: the organiser wants the list in a spreadsheet or a message,
+ * and asking them to retype twenty names is how the feature stops being used.
+ */
+function AttendeesModal({ event, onClose }: { event: AisaEvent | null; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const attendees = useApi(
+    () => (event ? registrationsApi.forEvent(event.id) : Promise.resolve([])),
+    [event?.id ?? ""],
+  );
+  const rows = attendees.data ?? [];
+
+  return (
+    <Modal
+      open={event !== null}
+      onClose={onClose}
+      title={event ? `Attendees — ${event.title}` : "Attendees"}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Close
+          </Button>
+          <Button
+            disabled={rows.length === 0}
+            onClick={async () => {
+              // Tab-separated, so it pastes into a spreadsheet as columns rather than
+              // as one string per row.
+              const text = [
+                ["Name", "Email", "Roll number", "Year", "Registered"].join("\t"),
+                ...rows.map((r) =>
+                  [
+                    r.name ?? "",
+                    r.email ?? "",
+                    r.rollNumber ?? "",
+                    r.year ?? "",
+                    new Date(r.registeredAt).toLocaleString("en-IN"),
+                  ].join("\t"),
+                ),
+              ].join("\n");
+              try {
+                await navigator.clipboard.writeText(text);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              } catch {
+                // Clipboard access denied (an insecure origin, or a permission prompt
+                // refused). The list is still on screen to read.
+              }
+            }}
+          >
+            {copied ? "Copied" : `Copy ${rows.length} row${rows.length === 1 ? "" : "s"}`}
+          </Button>
+        </>
+      }
+    >
+      {attendees.loading ? (
+        <Skeleton className="h-40" />
+      ) : attendees.error ? (
+        <ErrorNotice error={attendees.error} onRetry={attendees.reload} />
+      ) : rows.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-rule px-6 py-10 text-center text-xs text-muted">
+          Nobody has registered yet.
+        </p>
+      ) : (
+        <TableShell>
+          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
+            <tr>
+              <th className="px-4 py-2.5 text-start">Name</th>
+              <th className="px-4 py-2.5 text-start">Roll / year</th>
+              <th className="px-4 py-2.5 text-start">Registered</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((person) => (
+              <tr key={person.uid} className="border-t border-rule">
+                <td className="px-4 py-2.5">
+                  <span className="block text-sm font-medium text-ink">{person.name ?? "—"}</span>
+                  <span className="block text-xs text-muted">{person.email}</span>
+                </td>
+                <td className="px-4 py-2.5 text-xs text-muted">
+                  {person.rollNumber ?? "—"}
+                  {person.year ? ` · Year ${person.year}` : ""}
+                </td>
+                <td className="px-4 py-2.5 font-mono text-xs text-muted">
+                  {new Date(person.registeredAt).toLocaleDateString("en-IN")}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </TableShell>
+      )}
+    </Modal>
   );
 }

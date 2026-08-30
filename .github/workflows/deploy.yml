@@ -69,6 +69,14 @@ jobs:
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Building for $URL"
 
+      # Accounts fail CLOSED and visibly: without these the site still works for
+      # visitors, and every account screen says so rather than throwing from inside a
+      # form's submit handler. The warning is so nobody has to discover that from a user.
+      - name: Warn if accounts are not configured
+        if: vars.NEXT_PUBLIC_FIREBASE_API_KEY == ''
+        run: |
+          echo "::warning title=Accounts disabled::NEXT_PUBLIC_FIREBASE_API_KEY is unset, so sign-in, signup and password reset are unavailable on the published site. Set the NEXT_PUBLIC_FIREBASE_* variables under Settings > Secrets and variables > Actions > Variables, then re-run this workflow."
+
       - name: Warn if the API is not configured
         if: vars.NEXT_PUBLIC_API_BASE_URL == ''
         run: |
@@ -85,6 +93,16 @@ jobs:
           # failed build harder to read.
           NEXT_PUBLIC_SITE_URL: ${{ steps.site.outputs.url }}
           NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+          # Firebase Auth's web config. VARIABLES, not secrets, and that is correct:
+          # a browser cannot talk to Firebase Auth without them, and Google documents the
+          # web API key as a public project identifier. It identifies the project and
+          # authorises nothing — Firestore is never read from the browser, and the API
+          # decides what a signed-in person may do from their `users` document.
+          # The PRIVATE service-account key is a different thing and lives only on Render.
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
 
       # basePath is the one thing that fails silently and only in production, so assert
       # it in CI rather than discovering it by looking at the published site.

@@ -8,11 +8,13 @@ import { useAuth } from "@/lib/auth/context";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { AchievementsPanel } from "./achievements-panel";
+import { ApplicationsPanel } from "./applications-panel";
 import { CommitteesPanel } from "./committees-panel";
 import { EventsPanel } from "./events-panel";
 import { GalleryPanel } from "./gallery-panel";
 import { MembersPanel } from "./members-panel";
 import { MessagesPanel } from "./messages-panel";
+import { UsersPanel } from "./users-panel";
 import { AccountPanel, SettingsPanel } from "./settings-panel";
 
 const TABS = [
@@ -21,6 +23,8 @@ const TABS = [
   { id: "events", label: "Events" },
   { id: "gallery", label: "Gallery" },
   { id: "achievements", label: "Achievements" },
+  { id: "applications", label: "Applications" },
+  { id: "users", label: "Accounts" },
   { id: "messages", label: "Inbox" },
   { id: "settings", label: "Settings" },
   { id: "account", label: "Account" },
@@ -29,7 +33,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 export function Dashboard() {
-  const { username } = useAuth();
+  const { me } = useAuth();
   const [tab, setTab] = useState<TabId>("committees");
   const { data: stats } = useApi(() => statsApi.getForAdmin(), []);
 
@@ -50,7 +54,7 @@ export function Dashboard() {
             <p className="font-serif text-lg font-extrabold tracking-tight text-navy2">
               {SITE.name} Admin
             </p>
-            <p className="mt-0.5 text-xs text-muted">Signed in as {username}</p>
+            <p className="mt-0.5 text-xs text-muted">Signed in as {me?.name ?? me?.email}</p>
           </div>
           <Link
             href="/"
@@ -119,6 +123,8 @@ export function Dashboard() {
         {tab === "events" ? <EventsPanel /> : null}
         {tab === "gallery" ? <GalleryPanel /> : null}
         {tab === "achievements" ? <AchievementsPanel /> : null}
+        {tab === "applications" ? <ApplicationsPanel /> : null}
+        {tab === "users" ? <UsersPanel /> : null}
         {tab === "messages" ? <MessagesPanel /> : null}
         {tab === "settings" ? <SettingsPanel /> : null}
         {tab === "account" ? <AccountPanel /> : null}

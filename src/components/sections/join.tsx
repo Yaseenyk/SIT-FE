@@ -1,105 +1,255 @@
 "use client";
 
-import { committees as committeesApi, members as membersApi } from "@/lib/api/endpoints";
+import Link from "next/link";
+import { useMemo, useState, type FormEvent } from "react";
+import { Badge } from "@/components/ui/primitives";
+import {
+  applications as applicationsApi,
+  committees as committeesApi,
+  members as membersApi,
+} from "@/lib/api/endpoints";
+import { useAuth } from "@/lib/auth/context";
 import { useApi } from "@/lib/hooks/use-api";
-import { useSettings } from "@/lib/settings-context";
+import { useReveal } from "@/lib/hooks/use-reveal";
 
 /**
  * How a student joins, and which posts are currently open.
  *
- * Added because the site answered every question except the one a student visiting it
+ * <p>Added because the site answered every question except the one a student visiting it
  * actually has. The open-position list is derived from real data — committees that no
  * member is currently assigned to — rather than being a static list someone has to
  * remember to update, so it is correct the moment the roster changes.
+ *
+ * <p>It is now an application FORM rather than a "get in touch" instruction. The previous
+ * version told a student to speak to an office-bearer, which is exactly the informal
+ * process that leaves no record and no reply.
  */
 export function Join() {
-  const { settings } = useSettings();
+  const { state } = useAuth();
   const committees = useApi(() => committeesApi.list(), []);
   const members = useApi(() => membersApi.list(), []);
+  const mine = useApi(
+    () => (state === "active" ? applicationsApi.mine() : Promise.resolve([])),
+    [state],
+  );
+  const reveal = useReveal<HTMLDivElement>();
 
-  const filled = new Set((members.data ?? []).map((m) => m.committeeId).filter(Boolean));
-  const open = (committees.data ?? [])
-    .filter((c) => c.type !== "advisory" && !filled.has(c.id))
-    .sort((a, b) => a.order - b.order);
+  const [selected, setSelected] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<{ tone: "error" | "success"; text: string } | null>(null);
+
+  const open = useMemo(() => {
+    const filled = new Set(
+      (members.data ?? []).map((m) => m.committeeId).filter(Boolean) as string[],
+    );
+    return (committees.data ?? [])
+      .filter((c) => c.type !== "advisory" && !filled.has(c.id))
+      .sort((a, b) => a.order - b.order);
+  }, [committees.data, members.data]);
+
+  // Applying is allowed to any non-advisory committee, not only the empty ones: a
+  // committee can want more people without being empty. The "open" list is a prompt.
+  const choosable = useMemo(
+    () => (committees.data ?? []).filter((c) => c.type !== "advisory").sort((a, b) => a.order - b.order),
+    [committees.data],
+  );
+
+  const pending = new Set(
+    (mine.data ?? []).filter((a) => a.status === "PENDING").map((a) => a.committeeId),
+  );
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    setBusy(true);
+    setNotice(null);
+    try {
+      await applicationsApi.apply({
+        committeeId: String(data.get("committeeId") ?? ""),
+        motivation: String(data.get("motivation") ?? ""),
+      });
+      setNotice({
+        tone: "success",
+        text: "Application sent. You can follow it from your account page.",
+      });
+      setSelected("");
+      event.currentTarget.reset();
+      mine.reload();
+    } catch (applyError) {
+      setNotice({
+        tone: "error",
+        text: applyError instanceof Error ? applyError.message : "Could not send your application.",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
-    <section id="join" className="border-b border-rule bg-navy py-14 text-white sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+    <section id="join" className="band-navy pattern-dots relative isolate overflow-hidden py-20 text-white sm:py-24">
+      <div ref={reveal} className="reveal mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-gold uppercase">
+            <p className="text-xs font-semibold tracking-[0.16em] text-gold-bright uppercase">
               Membership
             </p>
-            <h2 className="mt-3 font-serif text-2xl font-bold text-white sm:text-3xl">
+            <h2 className="mt-4 font-serif text-3xl leading-tight font-bold text-white sm:text-4xl">
               Join the association
             </h2>
-            <p className="mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-white/85">
-              Membership is open to every student of the Department of CSE (AI &amp; ML).
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/80">
+              Membership is open to every student of the Department of CSE (AI&nbsp;&amp;&nbsp;ML).
               Committee positions are filled at the start of each academic year, and students
-              from all years are welcome to volunteer for events, workshops and outreach
-              activities at any time.
+              from all years are welcome to volunteer for events, workshops and outreach at
+              any time.
             </p>
 
-            <ol className="mt-7 grid gap-5 sm:grid-cols-3">
+            <ol className="mt-9 grid gap-6 sm:grid-cols-3">
               {[
-                { step: "01", title: "Get in touch", body: "Write to the association or speak to any office-bearer." },
-                { step: "02", title: "Pick a committee", body: "Choose the committee whose work matches your interests." },
-                { step: "03", title: "Start contributing", body: "Volunteer on the next event or research activity." },
+                { step: "01", title: "Create an account", body: "Sign up with your institute email address." },
+                { step: "02", title: "Pick a committee", body: "Choose the one whose work matches your interests." },
+                { step: "03", title: "Start contributing", body: "An office-bearer reviews your application and gets in touch." },
               ].map((item) => (
-                <li key={item.step} className="border-t-2 border-gold pt-3">
-                  <span className="text-xs font-semibold text-gold tabular-nums">{item.step}</span>
-                  <h3 className="mt-1 font-serif text-base font-bold text-white">{item.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-white/70">{item.body}</p>
+                <li key={item.step} className="border-t-2 border-gold-bright pt-4">
+                  <span className="font-mono text-xs font-semibold text-gold-bright tabular-nums">
+                    {item.step}
+                  </span>
+                  <h3 className="mt-2 font-serif text-base font-bold text-white">{item.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/65">{item.body}</p>
                 </li>
               ))}
             </ol>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#contact"
-                className="rounded bg-gold px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-gold/90"
-              >
-                Contact the association
-              </a>
-              {settings?.email ? (
-                <a
-                  href={`mailto:${settings.email}?subject=${encodeURIComponent("Joining AISA")}`}
-                  className="rounded border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-                >
-                  Email us
-                </a>
-              ) : null}
-            </div>
+            {/*
+              Only rendered when something is actually open. An "open positions" panel that
+              says "none" reads as neglect rather than as a full roster.
+            */}
+            {open.length > 0 ? (
+              <div className="mt-10 rounded-lg border border-white/15 bg-white/[0.06] p-6">
+                <h3 className="font-serif text-base font-bold text-white">
+                  Committees with no member listed
+                </h3>
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {open.map((committee) => (
+                    <li key={committee.id}>
+                      <button
+                        type="button"
+                        onClick={() => setSelected(committee.id)}
+                        className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:border-gold-bright hover:text-white"
+                      >
+                        {committee.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
 
-          {/*
-            Only rendered when something is actually open. An "open positions" panel that
-            says "none" is worse than no panel — it reads as neglect rather than as a full
-            roster.
-          */}
-          {open.length > 0 ? (
-            <aside className="self-start rounded border border-white/15 bg-white/[0.06] p-6">
-              <h3 className="font-serif text-base font-bold text-white">
-                Positions currently open
-              </h3>
-              <p className="mt-1 text-sm text-white/60">
-                {open.length} committee{open.length === 1 ? "" : "s"} with no member listed.
-              </p>
-              <ul className="mt-4 divide-y divide-white/10 border-t border-white/10">
-                {open.map((committee) => (
-                  <li key={committee.id} className="flex items-baseline justify-between gap-3 py-2.5">
-                    <a
-                      href={`#committee-${committee.id}`}
-                      className="text-sm font-medium text-white hover:text-gold hover:underline"
+          {/* ── The form ──────────────────────────────────────────────────── */}
+          <aside className="self-start rounded-lg border border-white/15 bg-white/[0.07] p-7 shadow-float backdrop-blur-sm">
+            <h3 className="font-serif text-xl font-bold text-white">Apply to a committee</h3>
+
+            {state === "loading" ? (
+              <p className="mt-5 animate-pulse text-sm text-white/60">Checking your account…</p>
+            ) : state !== "active" ? (
+              <div className="mt-5 space-y-5">
+                <p className="text-sm leading-relaxed text-white/70">
+                  Applications are tied to your account, so the committee can reply to you
+                  and you can see where your application stands.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href={state === "signed-out" ? "/signup/" : "/account/"}
+                    className="rounded-md bg-gold-bright px-5 py-2.5 text-sm font-semibold text-navy-deep"
+                  >
+                    {state === "signed-out" ? "Create an account" : "Finish setting up"}
+                  </Link>
+                  {state === "signed-out" ? (
+                    <Link
+                      href="/login/"
+                      className="rounded-md border border-white/25 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
                     >
-                      {committee.name}
-                    </a>
-                    <span className="shrink-0 text-xs text-white/50">{committee.sizeLabel}</span>
-                  </li>
-                ))}
-              </ul>
-            </aside>
-          ) : null}
+                      Sign in
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={onSubmit} className="mt-5 space-y-5">
+                <div>
+                  <label htmlFor="committeeId" className="block text-sm font-semibold text-white">
+                    Committee
+                  </label>
+                  <select
+                    id="committeeId"
+                    name="committeeId"
+                    required
+                    value={selected}
+                    onChange={(e) => setSelected(e.target.value)}
+                    className="mt-2 w-full rounded-md border border-white/25 bg-navy-deep px-3.5 py-2.5 text-sm text-white focus:border-gold-bright focus:outline-none"
+                  >
+                    <option value="">Choose a committee…</option>
+                    {choosable.map((committee) => (
+                      <option key={committee.id} value={committee.id} disabled={pending.has(committee.id)}>
+                        {committee.name}
+                        {pending.has(committee.id) ? " — already applied" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="motivation" className="block text-sm font-semibold text-white">
+                    Why do you want to join?
+                  </label>
+                  <p className="mt-0.5 text-xs text-white/55">
+                    A few sentences. At least 20 characters.
+                  </p>
+                  <textarea
+                    id="motivation"
+                    name="motivation"
+                    required
+                    minLength={20}
+                    maxLength={2000}
+                    rows={5}
+                    placeholder="What you would like to work on, and anything relevant you have done before."
+                    className="mt-2 w-full rounded-md border border-white/25 bg-navy-deep px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-gold-bright focus:outline-none"
+                  />
+                </div>
+
+                {notice ? (
+                  <p
+                    role="alert"
+                    className={`rounded-md border px-3.5 py-2.5 text-sm ${
+                      notice.tone === "success"
+                        ? "border-green/40 bg-green/15 text-white"
+                        : "border-red/40 bg-red/15 text-white"
+                    }`}
+                  >
+                    {notice.text}
+                  </p>
+                ) : null}
+
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full rounded-md bg-gold-bright px-5 py-3 text-sm font-semibold text-navy-deep transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                >
+                  {busy ? "Sending…" : "Send application"}
+                </button>
+
+                {(mine.data ?? []).length > 0 ? (
+                  <p className="flex flex-wrap items-center gap-2 text-xs text-white/60">
+                    <Badge tone="gold">{(mine.data ?? []).length}</Badge>
+                    application{(mine.data ?? []).length === 1 ? "" : "s"} so far —{" "}
+                    <Link href="/account/" className="font-semibold text-gold-bright hover:underline">
+                      see them on your account
+                    </Link>
+                  </p>
+                ) : null}
+              </form>
+            )}
+          </aside>
         </div>
       </div>
     </section>

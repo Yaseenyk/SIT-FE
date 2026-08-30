@@ -139,12 +139,6 @@ export interface AdminStats {
   unreadMessages: number;
 }
 
-export interface LoginResponse {
-  token: string;
-  tokenType: string;
-  expiresInSeconds: number;
-  username: string;
-}
 
 /** Everything the browser needs to POST an image straight to Cloudinary. */
 export interface UploadSignature {
@@ -165,4 +159,94 @@ export interface ApiErrorResponse {
   message: string;
   path: string;
   fieldErrors?: Record<string, string>;
+}
+
+// ── Accounts ────────────────────────────────────────────────────────────────
+
+export type UserRole = "STUDENT" | "ADMIN";
+
+/**
+ * The signed-in caller.
+ *
+ * `state` is the field the whole account UI turns on, and it exists because "signed in"
+ * is not one condition: a caller can hold a perfectly valid token and still be
+ * unregistered, unverified or suspended, each needing a different screen. Without it the
+ * frontend would be guessing from status codes.
+ */
+export interface Me {
+  uid: string;
+  email: string | null;
+  name: string | null;
+  role: UserRole | null;
+  state: "UNREGISTERED" | "UNVERIFIED" | "SUSPENDED" | "ACTIVE";
+  emailVerified: boolean;
+  rollNumber: string | null;
+  year: number | null;
+  photoUrl: string | null;
+  lastLoginAt: string | null;
+}
+
+/** A row in the admin user list. */
+export interface UserSummary {
+  uid: string;
+  email: string | null;
+  name: string | null;
+  role: UserRole;
+  status: "ACTIVE" | "SUSPENDED";
+  rollNumber: string | null;
+  year: number | null;
+  photoUrl: string | null;
+  lastLoginAt: string | null;
+  createdAt: string | null;
+}
+
+// ── Event registration ──────────────────────────────────────────────────────
+
+/** The student's own view: which events they are signed up for. */
+export interface MyRegistration {
+  eventId: string;
+  title: string;
+  startsOn: string;
+  dateLabel: string;
+  registeredAt: string;
+}
+
+/** The admin's attendance list. */
+export interface RegistrationSummary {
+  uid: string;
+  name: string | null;
+  email: string | null;
+  rollNumber: string | null;
+  year: number | null;
+  registeredAt: string;
+}
+
+// ── Committee applications ──────────────────────────────────────────────────
+
+export type ApplicationStatus = "PENDING" | "ACCEPTED" | "REJECTED";
+
+/** The student's own view. No reviewer identity — that is not their business. */
+export interface MyApplication {
+  id: string;
+  committeeId: string;
+  committeeName: string | null;
+  motivation: string;
+  status: ApplicationStatus;
+  appliedAt: string;
+  reviewedAt: string | null;
+}
+
+export interface ApplicationSummary {
+  id: string;
+  uid: string;
+  applicantName: string | null;
+  applicantEmail: string | null;
+  rollNumber: string | null;
+  year: number | null;
+  committeeId: string;
+  committeeName: string | null;
+  motivation: string;
+  status: ApplicationStatus;
+  appliedAt: string;
+  reviewedAt: string | null;
 }

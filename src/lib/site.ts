@@ -45,6 +45,7 @@ export const SECTIONS = [
   { id: "events", label: "Events" },
   { id: "gallery", label: "Gallery" },
   { id: "achievements", label: "Achievements" },
+  { id: "join", label: "Join us" },
   { id: "contact", label: "Contact" },
 ] as const;
 

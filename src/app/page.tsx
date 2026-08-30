@@ -9,6 +9,7 @@ import { Gallery } from "@/components/sections/gallery";
 import { Hero } from "@/components/sections/hero";
 import { Join } from "@/components/sections/join";
 import { Structure } from "@/components/sections/structure";
+import { AuthProvider } from "@/lib/auth/context";
 import { SettingsProvider } from "@/lib/settings-context";
 
 /**
@@ -20,24 +21,28 @@ import { SettingsProvider } from "@/lib/settings-context";
  * holds interaction state.
  *
  * SettingsProvider wraps all of them so the announcement, About, Contact and the footer
- * share one `/settings` request rather than making four.
+ * share one `/settings` request rather than making four. AuthProvider is here because the
+ * PUBLIC page now has signed-in actions on it — registering for an event, applying to a
+ * committee — and each needs to know whether there is an account behind the visitor.
  */
 export default function HomePage() {
   return (
-    <SettingsProvider>
-      <AnnouncementBar />
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Structure />
-        <Events />
-        <Gallery />
-        <Achievements />
-        <Join />
-        <Contact />
-      </main>
-      <Footer />
-    </SettingsProvider>
+    <AuthProvider>
+      <SettingsProvider>
+        <AnnouncementBar />
+        <Navbar />
+        <main>
+          <Hero />
+          <About />
+          <Structure />
+          <Events />
+          <Gallery />
+          <Achievements />
+          <Join />
+          <Contact />
+        </main>
+        <Footer />
+      </SettingsProvider>
+    </AuthProvider>
   );
 }

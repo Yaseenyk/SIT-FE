@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { events as eventsApi, stats as statsApi } from "@/lib/api/endpoints";
 import { useApi } from "@/lib/hooks/use-api";
 import { useSettings } from "@/lib/settings-context";
@@ -8,14 +9,16 @@ import { SITE } from "@/lib/site";
 /**
  * The landing section.
  *
- * Factual, not promotional. The previous version led with "Where AIML students build
- * things that run" set in gradient display type — copy written for a product launch. A
- * department's association introduces itself by saying who it is and what it runs; the
- * headline here is the association's own name and the paragraph is its own description,
- * pulled from settings so the committee can edit it.
+ * <p>Still factual — the headline is the association's own name, not a slogan, and the
+ * paragraph is its own description pulled from settings so the committee can edit it.
+ * What changed is the staging: a flat navy block with type on it read as a placeholder.
  *
- * The dark ground, particle canvas and glowing panels are gone. What replaces them is a
- * plain navy band, which is what an institutional page uses to mark its top.
+ * <p>Three things give it depth, and each is doing a job rather than decorating:
+ * a navy gradient with an off-centre light source, so a very wide block is not one dead
+ * colour; a faint dot grid, so the empty right-hand space has texture where there is no
+ * photograph to put there; and a "next event" card lifted onto a real shadow and pulled
+ * down over the section edge, which is what gives the whole band a foreground and a
+ * background instead of one plane.
  */
 export function Hero() {
   const { settings } = useSettings();
@@ -32,69 +35,77 @@ export function Hero() {
 
   return (
     <section id="home" className="scroll-mt-0">
-      <div className="bg-navy text-white">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <div className="grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:gap-14">
-            <div>
-              <p className="text-xs font-semibold tracking-[0.16em] text-gold uppercase">
+      {/* `relative` + `isolate`: the dot-grid ::before is absolutely positioned and must
+          not escape, and the lifted card below needs a stacking context to sit above it. */}
+      <div className="band-navy pattern-dots relative isolate overflow-hidden text-white">
+        <div className="mx-auto max-w-6xl px-4 pt-14 pb-28 sm:px-6 sm:pt-20 sm:pb-32">
+          <div className="grid items-start gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
+            <div className="relative">
+              <p className="flex items-center gap-3 text-xs font-semibold tracking-[0.18em] text-gold-bright uppercase">
+                <span aria-hidden className="h-px w-8 bg-gold-bright/60" />
                 {SITE.department}
               </p>
 
-              {/* The page's only h1. The association's name, not a slogan. */}
-              <h1 className="mt-3 font-serif text-3xl leading-tight font-bold text-white text-balance sm:text-[2.6rem]">
+              {/* The page's only h1. */}
+              <h1 className="mt-5 font-serif text-4xl leading-[1.08] font-bold text-white text-balance sm:text-5xl lg:text-[3.5rem]">
                 {SITE.longName}
               </h1>
 
-              <p className="mt-2 text-sm text-white/70">
+              <p className="mt-4 max-w-xl text-[0.95rem] text-white/60">
                 {SITE.institute}, {SITE.city}
               </p>
 
-              <p className="mt-6 max-w-2xl text-[0.95rem] leading-relaxed text-white/85">
+              <p className="mt-7 max-w-2xl text-base leading-relaxed text-white/85">
                 {settings?.aboutDescription ??
-                  `${SITE.name} is the student association of the Department of CSE (AI & ML). ` +"We run the workshops, hackathons, seminars and outreach programmes of the department."}
+                  `${SITE.name} is the student association of the Department of CSE (AI & ML). ` +
+                    "We run the workshops, hackathons, seminars and outreach programmes of the department."}
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-9 flex flex-wrap gap-3">
                 <a
                   href="#events"
-                  className="rounded bg-gold px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-gold/90"
+                  className="rounded-md bg-gold-bright px-6 py-3 text-sm font-semibold text-navy-deep shadow-lift transition-transform hover:-translate-y-0.5"
                 >
                   Upcoming events
                 </a>
-                <a
-                  href="#structure"
-                  className="rounded border border-white/30 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                <Link
+                  href="/signup/"
+                  className="rounded-md border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/15"
                 >
-                  Association structure
-                </a>
+                  Create an account
+                </Link>
               </div>
             </div>
 
             {/*
-              The next event, promoted out of the Events section."Is anything happening?" is the first question a visitor has, and a notice
-              panel is how a college site answers it. Rendered only when there is one, so
-              it never becomes an empty box.
+              The next event, promoted out of the Events section. "Is anything happening?"
+              is the first question a visitor has, and a notice panel is how a college site
+              answers it. Rendered only when there is one, so it never becomes an empty box.
             */}
             {nextEvent ? (
-              <aside className="self-start rounded border border-white/15 bg-white/[0.06] p-6">
-                <p className="flex items-center gap-2 text-[0.7rem] font-semibold tracking-[0.14em] text-gold uppercase">
-                  <span aria-hidden className="size-1.5 rounded-full bg-gold" />
+              <aside className="relative rounded-lg border border-white/15 bg-white/[0.07] p-7 shadow-float backdrop-blur-sm">
+                <span
+                  aria-hidden
+                  className="absolute -top-px left-7 h-0.5 w-14 bg-gold-bright"
+                />
+                <p className="text-[0.7rem] font-semibold tracking-[0.16em] text-gold-bright uppercase">
                   Next event
                 </p>
-                <h2 className="mt-3 font-serif text-lg leading-snug font-bold text-white">
+                <h2 className="mt-4 font-serif text-xl leading-snug font-bold text-white">
                   {nextEvent.title}
                 </h2>
-                <p className="mt-1.5 text-sm text-white/70">{nextEvent.dateLabel}</p>
+                <p className="mt-2 text-sm font-medium text-white/75">{nextEvent.dateLabel}</p>
                 {nextEvent.description ? (
-                  <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/70">
+                  <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-white/65">
                     {nextEvent.description}
                   </p>
                 ) : null}
                 <a
                   href="#events"
-                  className="mt-4 inline-block text-sm font-semibold text-gold hover:underline"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-gold-bright hover:gap-2.5"
                 >
-                  All events &rarr;
+                  All events
+                  <span aria-hidden className="transition-all">&rarr;</span>
                 </a>
               </aside>
             ) : null}
@@ -102,17 +113,28 @@ export function Hero() {
         </div>
       </div>
 
-      {/* The counters, as a band under the header rather than as four floating cards. */}
-      <div className="border-b border-rule bg-surface">
-        <dl className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-rule sm:grid-cols-4">
-          {counters.map((counter) => (
-            <div key={counter.label} className="px-4 py-5 text-center sm:px-6">
-              <dd className="font-serif text-2xl font-bold text-navy tabular-nums">
+      {/*
+        The counters, pulled UP over the navy band so the card overlaps both sections.
+        The overlap is the point: it stitches the two bands together and stops the page
+        reading as a stack of unrelated full-width strips.
+      */}
+      <div className="relative z-10 mx-auto -mt-16 max-w-6xl px-4 sm:px-6">
+        <dl className="grid grid-cols-2 overflow-hidden rounded-lg border border-rule bg-paper shadow-lift sm:grid-cols-4">
+          {counters.map((counter, index) => (
+            <div
+              key={counter.label}
+              className={`px-4 py-7 text-center ${
+                index > 0 ? "border-s border-rule" : ""
+              } ${index === 2 ? "border-s-0 sm:border-s" : ""} ${
+                index >= 2 ? "border-t border-rule sm:border-t-0" : ""
+              }`}
+            >
+              <dd className="font-serif text-3xl font-bold text-navy tabular-nums sm:text-4xl">
                 {/* An em dash while loading, not 0. A real zero and "not known yet" are
                     different facts, and showing 0 first makes every counter jump. */}
                 {counter.value ?? "—"}
               </dd>
-              <dt className="mt-1 text-[0.72rem] font-semibold tracking-wide text-muted uppercase">
+              <dt className="mt-2 text-[0.7rem] font-semibold tracking-[0.1em] text-muted uppercase">
                 {counter.label}
               </dt>
             </div>
