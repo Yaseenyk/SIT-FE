@@ -104,16 +104,38 @@ jobs:
             exit 1
           fi
 
-      # `enablement: true` asks the action to turn Pages on itself if it is off.
+      # ── Make sure Pages is publishing THIS workflow, not Jekyll ──────────────
       #
-      # Without it this step is where a brand-new repository fails: Pages defaults to
-      # disabled, the action cannot find a Pages site, and it errors with "Get Pages site
-      # failed" — after every build step has already passed, which makes it read like a
-      # build problem rather than a settings one.
+      # Pages has two sources: "Deploy from a branch" (GitHub runs its own Jekyll build)
+      # and "GitHub Actions" (this workflow). `enablement: true` below turns Pages on if
+      # it is off, but it does NOT change the source of an already-enabled site — and a
+      # site enabled that way defaults to the BRANCH source.
       #
-      # It is not a substitute for the setting. If an org policy blocks Actions from
-      # enabling Pages, this still fails and someone has to set
-      # Settings → Pages → Source: GitHub Actions by hand.
+      # The result is two publishers racing. GitHub's Jekyll build renders README.md and
+      # deploys that; this workflow deploys the real site; whichever finishes last wins.
+      # It did in fact alternate: one deploy served the site, the next served the README,
+      # with nothing failing either time.
+      #
+      # So force the source to `workflow`. The token already carries pages:write for the
+      # deployment below, and once set, GitHub stops running its Jekyll build entirely.
+      - name: Ensure Pages is set to deploy from Actions
+        run: |
+          CURRENT=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type' 2>/dev/null || echo "none")
+          echo "Pages build_type is currently: $CURRENT"
+          if [ "$CURRENT" = "workflow" ]; then
+            echo "Already correct."
+          elif [ "$CURRENT" = "none" ]; then
+            echo "Pages not enabled yet — configure-pages will enable it below."
+          else
+            echo "Switching from '$CURRENT' to 'workflow' so Jekyll stops publishing over this site."
+            gh api -X PUT "repos/$GITHUB_REPOSITORY/pages" -f build_type=workflow
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Advisory: if the token is not permitted to change this (an org policy, say), the
+        # deploy should still run — and the manual fix is Settings → Pages → Source.
+        continue-on-error: true
+
       - uses: actions/configure-pages@v5
         with:
           enablement: true
