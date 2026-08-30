@@ -1,6 +1,7 @@
 import { AnnouncementBar } from "@/components/core/announcement-bar";
 import { Footer } from "@/components/core/footer";
 import { Navbar } from "@/components/core/navbar";
+import { WakingNotice } from "@/components/core/waking-notice";
 import { About } from "@/components/sections/about";
 import { Achievements } from "@/components/sections/achievements";
 import { Contact } from "@/components/sections/contact";
@@ -29,6 +30,7 @@ export default function HomePage() {
   return (
     <AuthProvider>
       <SettingsProvider>
+        <WakingNotice />
         <AnnouncementBar />
         <Navbar />
         <main>

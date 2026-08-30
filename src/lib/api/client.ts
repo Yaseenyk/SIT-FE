@@ -51,9 +51,48 @@ async function currentToken(): Promise<string | null> {
 
 export const AUTH_EXPIRED_EVENT = "aisa:auth-expired";
 
-const DEFAULT_TIMEOUT_MS = 20_000;
+/*
+ * Longer than the platform's cold start, which is the whole point.
+ *
+ * This was 20s, sitting directly above a comment that correctly said free-tier hosts
+ * "take ~50s to wake" — so the abort ALWAYS fired first and the very first visit after
+ * the API had been idle could never succeed. Every section showed "the server took too
+ * long", and the only way through was a manual reload once something else had happened
+ * to wake it. A measured cold start on Render's free tier is ~43s.
+ *
+ * The cost of the larger number is bounded: a server that is genuinely down refuses the
+ * connection rather than hanging, so this ceiling is only ever reached while something
+ * really is waking up.
+ */
+const DEFAULT_TIMEOUT_MS = 75_000;
+
+/**
+ * How long a request may take before the UI should explain itself.
+ *
+ * A blank page of skeletons for three-quarters of a minute is indistinguishable from a
+ * broken site. Past this point `SLOW_REQUEST_EVENT` fires and the page can say what is
+ * happening — see `components/core/waking-notice.tsx`.
+ */
+const SLOW_REQUEST_MS = 6_000;
+
 /** Cloudinary uploads go direct from the browser and can be slow on campus wifi. */
 const UPLOAD_TIMEOUT_MS = 120_000;
+
+/**
+ * Fired when a request has been in flight long enough to look broken, and again when
+ * every slow request has settled. `detail.pending` is how many are still outstanding.
+ */
+export const SLOW_REQUEST_EVENT = "aisa:slow-request";
+
+let slowPending = 0;
+
+function announceSlow(delta: number): void {
+  slowPending = Math.max(0, slowPending + delta);
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent(SLOW_REQUEST_EVENT, { detail: { pending: slowPending } }),
+  );
+}
 
 export class ApiError extends Error {
   readonly status: number;
@@ -127,6 +166,14 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   const token = anonymous ? null : await currentToken();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  // Announced only if the request is still running when this fires, and always retracted
+  // in the `finally` below — so a fast request never touches the counter at all.
+  let announcedSlow = false;
+  const slowTimer = setTimeout(() => {
+    announcedSlow = true;
+    announceSlow(1);
+  }, SLOW_REQUEST_MS);
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
   try {
@@ -170,7 +217,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
        * mystifying failure into something the visitor knows to wait out.
        */
       throw new ApiError(
-        "The server took too long to respond. If it has been idle it may be waking up — try again in a minute.",
+        "The server did not respond within 75 seconds. It may be starting up — reload in a moment.",
         0,
       );
     }
@@ -180,6 +227,8 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     );
   } finally {
     clearTimeout(timer);
+    clearTimeout(slowTimer);
+    if (announcedSlow) announceSlow(-1);
   }
 }
 
