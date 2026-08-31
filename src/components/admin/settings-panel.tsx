@@ -60,7 +60,7 @@ export function SettingsPanel() {
 
       <form onSubmit={onSubmit} className="space-y-8">
         <fieldset className="space-y-4">
-          <legend className="mb-2 font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
+          <legend className="mb-2 font-display text-xs font-bold tracking-wider text-sky uppercase">
             Contact
           </legend>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -118,7 +118,7 @@ export function SettingsPanel() {
         </fieldset>
 
         <fieldset className="space-y-4">
-          <legend className="mb-2 font-serif text-xs font-bold tracking-wider text-navy2 uppercase">
+          <legend className="mb-2 font-display text-xs font-bold tracking-wider text-sky uppercase">
             About section
           </legend>
           <Field label="Heading" htmlFor="s-about-title">
@@ -192,8 +192,8 @@ export function AccountPanel() {
         ) : null}
 
         {data.data?.announcement ? (
-          <p className="mb-4 rounded-lg border border-rule bg-sunken px-4 py-2.5 text-xs">
-            Live now: <span className="text-navy2">{data.data.announcement.text}</span>
+          <p className="mb-4 rounded-lg border border-line bg-card2 px-4 py-2.5 text-xs">
+            Live now: <span className="text-sky">{data.data.announcement.text}</span>
           </p>
         ) : null}
 
@@ -299,13 +299,13 @@ export function AccountPanel() {
 
           <Link
             href="/account/"
-            className="inline-flex items-center rounded-lg border border-rule-strong px-4 py-2 text-sm font-semibold text-ink"
+            className="inline-flex items-center rounded-lg border border-line2 px-4 py-2 text-sm font-semibold text-ink"
           >
             Edit my profile
           </Link>
         </div>
 
-        <div className="mt-8 border-t border-rule pt-6">
+        <div className="mt-8 border-t border-line pt-6">
           <Button variant="ghost" onClick={signOut}>
             Sign out
           </Button>

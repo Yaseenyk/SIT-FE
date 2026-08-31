@@ -16,17 +16,17 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-navy text-white/75">
+    <footer className="border-t border-line bg-card text-muted">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-1">
           <div className="flex items-center gap-3">
             <span
               aria-hidden
-              className="flex size-10 shrink-0 items-center justify-center rounded-sm bg-white font-serif text-[0.65rem] leading-none font-bold text-navy"
+              className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-sky2 to-cyan font-display text-[0.55rem] leading-none font-bold text-bg"
             >
               AISA
             </span>
-            <span className="font-serif text-base font-bold text-white">{SITE.name}</span>
+            <span className="font-display text-base font-bold text-white">{SITE.name}</span>
           </div>
           <p className="mt-4 text-sm leading-relaxed">
             {SITE.longName}

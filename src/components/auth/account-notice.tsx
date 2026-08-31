@@ -89,14 +89,14 @@ export function AccountNotice() {
                   setBusy(false);
                 }
               }}
-              className="rounded-md border border-rule-strong px-5 py-2.5 text-sm font-semibold text-ink disabled:opacity-50"
+              className="rounded-md border border-line2 px-5 py-2.5 text-sm font-semibold text-ink disabled:opacity-50"
             >
               Resend the email
             </button>
           </div>
 
           <p className="text-sm">
-            <button type="button" onClick={signOut} className="text-muted hover:text-navy2">
+            <button type="button" onClick={signOut} className="text-muted hover:text-sky">
               Sign out
             </button>
           </p>
@@ -119,14 +119,14 @@ export function AccountNotice() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/#contact"
-              className="rounded-md bg-navy px-5 py-2.5 text-sm font-semibold text-white"
+              className="rounded-md bg-sky2 px-5 py-2.5 text-sm font-semibold text-white"
             >
               Contact the association
             </Link>
             <button
               type="button"
               onClick={signOut}
-              className="rounded-md border border-rule-strong px-5 py-2.5 text-sm font-semibold text-ink"
+              className="rounded-md border border-line2 px-5 py-2.5 text-sm font-semibold text-ink"
             >
               Sign out
             </button>
@@ -158,7 +158,7 @@ export function AccountNotice() {
           <Button onClick={signOut}>Sign out and start again</Button>
           <Link
             href="/"
-            className="rounded-md border border-rule-strong px-5 py-2.5 text-sm font-semibold text-ink"
+            className="rounded-md border border-line2 px-5 py-2.5 text-sm font-semibold text-ink"
           >
             Back to the site
           </Link>

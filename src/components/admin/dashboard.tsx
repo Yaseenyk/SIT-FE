@@ -48,17 +48,17 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-rule bg-surface">
+      <header className="border-b border-line bg-bg2">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
           <div>
-            <p className="font-serif text-lg font-extrabold tracking-tight text-navy2">
+            <p className="font-display text-lg font-extrabold tracking-tight text-sky">
               {SITE.name} Admin
             </p>
             <p className="mt-0.5 text-xs text-muted">Signed in as {me?.name ?? me?.email}</p>
           </div>
           <Link
             href="/"
-            className="rounded-lg border border-rule-strong px-3 py-1.5 text-xs text-navy2 hover:bg-navy/10"
+            className="rounded-lg border border-line2 px-3 py-1.5 text-xs text-sky hover:bg-sky2/10"
           >
             View site →
           </Link>
@@ -73,7 +73,7 @@ export function Dashboard() {
                 className={cn("font-mono text-xl font-bold tabular-nums",
                   // Unread messages are the one counter that should pull the eye, and
                   // only when there actually are any.
-                  counter.alert && (counter.value ?? 0) > 0 ? "text-gold" : "text-navy2",
+                  counter.alert && (counter.value ?? 0) > 0 ? "text-sky" : "text-sky",
                 )}
               >
                 {counter.value ?? "—"}
@@ -88,7 +88,7 @@ export function Dashboard() {
         <div
           role="tablist"
           aria-label="Admin sections"
-          className="mb-8 flex flex-wrap gap-2 border-b border-rule pb-3"
+          className="mb-8 flex flex-wrap gap-2 border-b border-line pb-3"
         >
           {TABS.map((item) => (
             <button
@@ -98,13 +98,13 @@ export function Dashboard() {
               onClick={() => setTab(item.id)}
               className={cn("rounded-lg px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-colors",
                 tab === item.id
-                  ? "bg-navy/12 text-navy2"
-                  : "text-muted hover:bg-sunken hover:text-ink",
+                  ? "bg-sky2/12 text-sky"
+                  : "text-muted hover:bg-card2 hover:text-ink",
               )}
             >
               {item.label}
               {item.id === "messages" && (stats?.unreadMessages ?? 0) > 0 ? (
-                <span className="ms-1.5 rounded-full bg-gold px-1.5 font-mono text-[0.6rem] text-bg">
+                <span className="ms-1.5 rounded-full bg-sky px-1.5 font-mono text-[0.6rem] text-bg">
                   {stats?.unreadMessages}
                 </span>
               ) : null}

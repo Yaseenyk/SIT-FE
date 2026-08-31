@@ -45,10 +45,10 @@ function Gate() {
   if (!isAdmin) {
     return (
       <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-4 text-center">
-        <p className="text-xs font-semibold tracking-[0.16em] text-gold uppercase">
+        <p className="text-xs font-semibold tracking-[0.16em] text-sky uppercase">
           Not an administrator
         </p>
-        <h1 className="mt-4 font-serif text-2xl font-bold">
+        <h1 className="mt-4 font-display text-2xl font-bold">
           You are signed in as a student
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted">
@@ -58,13 +58,13 @@ function Gate() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/account/"
-            className="rounded-md bg-navy px-5 py-2.5 text-sm font-semibold text-white"
+            className="rounded-md bg-sky2 px-5 py-2.5 text-sm font-semibold text-white"
           >
             Go to my account
           </Link>
           <Link
             href="/"
-            className="rounded-md border border-rule-strong px-5 py-2.5 text-sm font-semibold text-ink"
+            className="rounded-md border border-line2 px-5 py-2.5 text-sm font-semibold text-ink"
           >
             Back to the site
           </Link>

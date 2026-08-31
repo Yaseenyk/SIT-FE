@@ -42,7 +42,7 @@ export function Achievements() {
   );
 
   return (
-    <section id="achievements" className="border-b border-rule bg-surface py-16 sm:py-20">
+    <section id="achievements" className="border-b border-line bg-bg2 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           eyebrow="Recognition"
@@ -87,18 +87,18 @@ export function Achievements() {
                         ) : null}
                       </div>
 
-                      <h3 className="mt-2 font-serif text-base leading-snug font-bold text-ink text-balance">
+                      <h3 className="mt-2 font-display text-base leading-snug font-bold text-ink text-balance">
                         {achievement.title}
                       </h3>
 
-                      <p className="mt-1 text-sm font-semibold text-navy2">
+                      <p className="mt-1 text-sm font-semibold text-sky">
                         {achievement.student}
                       </p>
                     </div>
                   </div>
 
                   {achievement.description ? (
-                    <p className="mt-3 border-t border-rule pt-3 text-sm leading-relaxed text-body">
+                    <p className="mt-3 border-t border-line pt-3 text-sm leading-relaxed text-body">
                       {achievement.description}
                     </p>
                   ) : null}

@@ -77,7 +77,7 @@ function SignInInner() {
       footer={
         <>
           Don&apos;t have an account?{" "}
-          <Link href="/signup/" className="font-semibold text-navy2 hover:underline">
+          <Link href="/signup/" className="font-semibold text-sky hover:underline">
             Create one
           </Link>
         </>
@@ -102,7 +102,7 @@ function SignUpInner() {
       footer={
         <>
           Already have one?{" "}
-          <Link href="/login/" className="font-semibold text-navy2 hover:underline">
+          <Link href="/login/" className="font-semibold text-sky hover:underline">
             Sign in
           </Link>
         </>

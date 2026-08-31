@@ -65,7 +65,7 @@ export function SignInForm({ onDone }: { onDone?: () => void }) {
           <button
             type="button"
             onClick={() => setShow((value) => !value)}
-            className="absolute inset-y-0 end-0 px-3.5 text-xs font-semibold text-muted hover:text-navy2"
+            className="absolute inset-y-0 end-0 px-3.5 text-xs font-semibold text-muted hover:text-sky"
           >
             {show ? "Hide" : "Show"}
           </button>
@@ -79,7 +79,7 @@ export function SignInForm({ onDone }: { onDone?: () => void }) {
       </Button>
 
       <p className="text-center text-sm">
-        <Link href="/forgot-password/" className="text-navy2 hover:underline">
+        <Link href="/forgot-password/" className="text-sky hover:underline">
           Forgot your password?
         </Link>
       </p>

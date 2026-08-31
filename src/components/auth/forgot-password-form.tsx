@@ -68,14 +68,14 @@ export function ForgotPasswordForm() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/login/"
-            className="rounded-md bg-navy px-5 py-2.5 text-sm font-semibold text-white"
+            className="rounded-md bg-sky2 px-5 py-2.5 text-sm font-semibold text-white"
           >
             Back to sign in
           </Link>
           <button
             type="button"
             onClick={() => setSent(null)}
-            className="rounded-md border border-rule-strong px-5 py-2.5 text-sm font-semibold text-ink"
+            className="rounded-md border border-line2 px-5 py-2.5 text-sm font-semibold text-ink"
           >
             Use a different address
           </button>
@@ -106,7 +106,7 @@ export function ForgotPasswordForm() {
       </Button>
 
       <p className="text-center text-sm">
-        <Link href="/login/" className="text-navy2 hover:underline">
+        <Link href="/login/" className="text-sky hover:underline">
           Remembered it? Sign in
         </Link>
       </p>

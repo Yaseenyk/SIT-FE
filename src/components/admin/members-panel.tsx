@@ -5,7 +5,7 @@ import { Button, ErrorNotice, Modal } from "@/components/ui/interactive";
 import { Skeleton } from "@/components/ui/primitives";
 import { committees as committeesApi, members as membersApi } from "@/lib/api/endpoints";
 import { useApi } from "@/lib/hooks/use-api";
-import type { Member } from "@/types/api";
+import type { AdminMember } from "@/types/api";
 import {
   DeleteButton,
   FIELD,
@@ -24,19 +24,21 @@ type Draft = {
 };
 
 export function MembersPanel() {
-  const members = useApi(() => membersApi.list(), []);
+  // The admin route, not the public one: this panel edits phone and email, and the
+  // public listing deliberately carries neither.
+  const members = useApi(() => membersApi.listForAdmin(), []);
   const committees = useApi(() => committeesApi.list(), []);
   const { notice, busy, run, clearNotice } = useActionState();
 
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [editing, setEditing] = useState<Member | null>(null);
+  const [editing, setEditing] = useState<AdminMember | null>(null);
 
   function openNew() {
     setEditing(null);
     setDraft({ id: null, photoUrl: null, photoPublicId: null });
   }
 
-  function openEdit(member: Member) {
+  function openEdit(member: AdminMember) {
     setEditing(member);
     // photoPublicId is not on the response DTO (it is an admin-only storage detail), so
     // an edit that does not touch the photo sends null and the server keeps what it has.
@@ -56,13 +58,14 @@ export function MembersPanel() {
       linkedinUrl: String(data.get("linkedinUrl") ?? ""),
       githubUrl: String(data.get("githubUrl") ?? ""),
       email: String(data.get("email") ?? ""),
+      phone: String(data.get("phone") ?? ""),
       photoUrl: draft.photoUrl,
       photoPublicId: draft.photoPublicId,
     };
 
     const ok = await run(
       () => (draft.id ? membersApi.update(draft.id, body) : membersApi.create(body)),
-      draft.id ? "Member updated" : "Member added",
+      draft.id ? "AdminMember updated" : "AdminMember added",
     );
     if (ok) {
       setDraft(null);
@@ -88,7 +91,7 @@ export function MembersPanel() {
         <ErrorNotice error={members.error} onRetry={members.reload} />
       ) : (
         <TableShell>
-          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Name</th>
               <th className="px-4 py-3 text-start">Role</th>
@@ -99,7 +102,7 @@ export function MembersPanel() {
           </thead>
           <tbody>
             {(members.data ?? []).map((member) => (
-              <tr key={member.id} className="border-t border-rule">
+              <tr key={member.id} className="border-t border-line">
                 <td className="px-4 py-3">
                   <span className="flex items-center gap-2.5">
                     {member.photoUrl ? (
@@ -112,7 +115,7 @@ export function MembersPanel() {
                 <td className="px-4 py-3 text-muted">
                   {/* An unassigned member is the visible consequence of deleting a
                       committee, and it must be obvious rather than an empty cell. */}
-                  {member.committeeName ?? <span className="text-gold">Unassigned</span>}
+                  {member.committeeName ?? <span className="text-sky">Unassigned</span>}
                 </td>
                 <td className="px-4 py-3 text-muted">{member.academicYear}</td>
                 <td className="px-4 py-3">
@@ -198,6 +201,20 @@ export function MembersPanel() {
               name="email"
               type="email"
               defaultValue={editing?.email ?? ""}
+              className={FIELD}
+            />
+          </Field>
+
+          <Field
+            label="Mobile number"
+            htmlFor="m-phone"
+            hint="Never shown on the public site — dashboard only."
+          >
+            <input
+              id="m-phone"
+              name="phone"
+              inputMode="tel"
+              defaultValue={editing?.phone ?? ""}
               className={FIELD}
             />
           </Field>

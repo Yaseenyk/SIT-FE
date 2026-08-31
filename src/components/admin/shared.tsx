@@ -8,7 +8,7 @@ import type { UploadFolder } from "@/lib/api/endpoints";
 import { cn } from "@/lib/utils";
 
 /** The one input style used across every admin form. */
-export const FIELD ="w-full rounded-lg border border-rule bg-surface px-3 py-2 text-sm text-ink " +"placeholder:text-muted/70 focus:border-sky focus:outline-none disabled:opacity-50";
+export const FIELD ="w-full rounded-lg border border-line bg-bg2 px-3 py-2 text-sm text-ink " +"placeholder:text-muted/70 focus:border-sky focus:outline-none disabled:opacity-50";
 
 export function Field({
   label,
@@ -26,7 +26,7 @@ export function Field({
   return (
     <div>
       <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-semibold">
-        {label} {required ? <span className="text-red">*</span> : null}
+        {label} {required ? <span className="text-rose">*</span> : null}
       </label>
       {children}
       {hint ? <p className="mt-1 text-[0.65rem] text-muted">{hint}</p> : null}
@@ -55,8 +55,8 @@ export function Notice({
       role={tone === "error" ? "alert" : "status"}
       className={cn("mb-4 flex items-start justify-between gap-3 rounded-lg border px-4 py-2.5 text-xs",
         tone === "ok"
-          ? "border-emerald/25 bg-green/10 text-green"
-          : "border-red/25 bg-red/10 text-red",
+          ? "border-emerald/25 bg-emerald/10 text-emerald"
+          : "border-rose/25 bg-rose/10 text-rose",
       )}
     >
       <span>{children}</span>
@@ -167,7 +167,7 @@ export function ImagePicker({
       ) : (
         <span
           aria-hidden
-          className="flex size-14 items-center justify-center rounded-lg border border-dashed border-rule text-muted"
+          className="flex size-14 items-center justify-center rounded-lg border border-dashed border-line text-muted"
         >
           🖼
         </span>
@@ -205,14 +205,14 @@ export function ImagePicker({
               setUploading(false);
             }
           }}
-          className="w-full text-xs text-muted file:mr-3 file:rounded-md file:border-0 file:bg-sunken file:px-3 file:py-1.5 file:text-xs file:text-navy2"
+          className="w-full text-xs text-muted file:mr-3 file:rounded-md file:border-0 file:bg-card2 file:px-3 file:py-1.5 file:text-xs file:text-sky"
         />
-        {uploading ? <p className="mt-1 text-[0.65rem] text-navy2">Uploading…</p> : null}
-        {error ? <p className="mt-1 text-[0.65rem] text-red">{error}</p> : null}
+        {uploading ? <p className="mt-1 text-[0.65rem] text-sky">Uploading…</p> : null}
+        {error ? <p className="mt-1 text-[0.65rem] text-rose">{error}</p> : null}
         {value.url && !uploading ? (
           <button
             onClick={() => onChange({ url: null, publicId: null })}
-            className="mt-1 text-[0.65rem] text-muted hover:text-red"
+            className="mt-1 text-[0.65rem] text-muted hover:text-rose"
           >
             Remove image
           </button>
@@ -238,7 +238,7 @@ export function Panel({
     <section>
       <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-serif text-lg font-bold tracking-tight">{title}</h2>
+          <h2 className="font-display text-lg font-bold tracking-tight">{title}</h2>
           {description ? <p className="mt-1 text-xs text-muted">{description}</p> : null}
         </div>
         {action}
@@ -251,7 +251,7 @@ export function Panel({
 /** A horizontally scrollable table shell — admin tables are wide and phones are not. */
 export function TableShell({ children }: { children: ReactNode }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-rule">
+    <div className="overflow-x-auto rounded-xl border border-line">
       <table className="w-full min-w-[40rem] text-start text-sm">{children}</table>
     </div>
   );

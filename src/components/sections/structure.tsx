@@ -7,7 +7,6 @@ import { committees as committeesApi, members as membersApi } from "@/lib/api/en
 import { useApi } from "@/lib/hooks/use-api";
 import { useReveal } from "@/lib/hooks/use-reveal";
 import type { Committee, CommitteeType, Member } from "@/types/api";
-import { cn } from "@/lib/utils";
 
 /**
  * The association's structure: advisory, executive, then the functional committees.
@@ -25,22 +24,22 @@ import { cn } from "@/lib/utils";
  * across reloads, and impossible to leave unset.
  */
 
-/** Full class strings — Tailwind scans source text, so `border-t-${x}` compiles to nothing. */
-const ACCENTS = [
-  { bar: "border-t-navy2", dot: "bg-navy2", tint: "bg-navy-tint" },
-  { bar: "border-t-gold", dot: "bg-gold", tint: "bg-gold-soft" },
-  { bar: "border-t-clay", dot: "bg-clay", tint: "bg-clay-soft" },
-  { bar: "border-t-green", dot: "bg-green", tint: "bg-green-soft" },
-] as const;
-
-function accentFor(id: string): (typeof ACCENTS)[number] {
-  // A tiny stable hash. Not cryptographic — it only has to spread ids across four buckets
-  // and give the same answer every time, so a committee does not change colour on reload.
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-  // The `?? ACCENTS[0]` is for noUncheckedIndexedAccess, not for a real case: the modulo
-  // cannot leave the array. Non-null assertions are banned by the lint config.
-  return ACCENTS[hash % ACCENTS.length] ?? ACCENTS[0];
+/**
+ * The bar across the top of each committee card.
+ *
+ * <p>It comes from {@code committee.gradient} — a per-record value the admin authors, and
+ * one of the two documented places in this codebase where an inline style is correct,
+ * because a value that arrives from the database cannot be a Tailwind class.
+ *
+ * <p>An earlier version derived the colour from a hash of the committee id instead. That
+ * was wrong twice over: it ignored data the API was already returning, and the palette it
+ * cycled through included `rose` and `emerald` — the STATUS colours. A "Vice President"
+ * card with a red bar reads as an error, not as an identity.
+ *
+ * <p>The fallback is the brand accent, never a status colour, for the same reason.
+ */
+function barStyle(gradient: string | null): React.CSSProperties {
+  return { background: gradient ?? "linear-gradient(135deg,#0ea5e9,#22d3ee)" };
 }
 
 const GROUPS: { type: CommitteeType; label: string; blurb: string }[] = [
@@ -90,7 +89,7 @@ export function Structure() {
   }, [committees.data]);
 
   return (
-    <section id="structure" className="border-t border-rule bg-surface py-20 sm:py-24">
+    <section id="structure" className="border-t border-line bg-bg2 py-20 sm:py-24">
       <div ref={reveal} className="reveal mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           eyebrow="Organisation"
@@ -115,8 +114,8 @@ export function Structure() {
           <div className="space-y-16">
             {grouped.map((group) => (
               <div key={group.type}>
-                <div className="mb-7 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-rule-strong pb-3">
-                  <h3 className="font-serif text-xl font-bold text-ink sm:text-2xl">
+                <div className="mb-7 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-line2 pb-3">
+                  <h3 className="font-display text-xl font-bold text-ink sm:text-2xl">
                     {group.label}
                   </h3>
                   <p className="max-w-xl text-sm text-muted">{group.blurb}</p>
@@ -142,7 +141,6 @@ export function Structure() {
 
 function CommitteeCard({ committee, members }: { committee: Committee; members: Member[] }) {
   const [open, setOpen] = useState(false);
-  const accent = accentFor(committee.id);
   const responsibilities = committee.responsibilities ?? [];
   const shown = open ? responsibilities : responsibilities.slice(0, 3);
 
@@ -161,10 +159,15 @@ function CommitteeCard({ committee, members }: { committee: Committee; members: 
   return (
     <article
       id={`committee-${committee.id}`}
-      className={cn("card card-hover flex scroll-mt-32 flex-col border-t-[3px] p-6", accent.bar)}
+      className="card card-hover relative flex scroll-mt-32 flex-col overflow-hidden p-6"
     >
+      <span
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-[3px]"
+        style={barStyle(committee.gradient)}
+      />
       <div className="flex items-start justify-between gap-3">
-        <h4 className="font-serif text-lg leading-snug font-bold text-ink">{committee.name}</h4>
+        <h4 className="font-display text-lg leading-snug font-bold text-ink">{committee.name}</h4>
         {committee.badge ? <Badge tone="muted">{committee.badge}</Badge> : null}
       </div>
 
@@ -178,7 +181,7 @@ function CommitteeCard({ committee, members }: { committee: Committee; members: 
         expandable panel answers it only for someone who already knows to expand.
       */}
       {people.length > 0 ? (
-        <ul className="mt-5 space-y-3 border-t border-rule pt-4">
+        <ul className="mt-5 space-y-3 border-t border-line pt-4">
           {people.slice(0, 3).map((person, index) => (
             <li key={`${person.name}-${index}`} className="flex items-center gap-3">
               <Avatar src={person.photo} name={person.name} size="sm" />
@@ -197,20 +200,20 @@ function CommitteeCard({ committee, members }: { committee: Committee; members: 
           ) : null}
         </ul>
       ) : (
-        <p className="mt-5 border-t border-rule pt-4 text-xs text-muted italic">
+        <p className="mt-5 border-t border-line pt-4 text-xs text-muted italic">
           No members listed yet.
         </p>
       )}
 
       {responsibilities.length > 0 ? (
-        <div className="mt-5 border-t border-rule pt-4">
+        <div className="mt-5 border-t border-line pt-4">
           <p className="mb-2.5 text-[0.68rem] font-semibold tracking-[0.1em] text-muted uppercase">
             Responsibilities
           </p>
           <ul className="space-y-1.5">
             {shown.map((item) => (
               <li key={item} className="flex gap-2.5 text-sm leading-relaxed text-body">
-                <span aria-hidden className={cn("mt-1.5 size-1.5 shrink-0 rounded-full", accent.dot)} />
+                <span aria-hidden className="mt-1.5 size-1.5 shrink-0 rounded-full bg-sky" />
                 {item}
               </li>
             ))}
@@ -219,7 +222,7 @@ function CommitteeCard({ committee, members }: { committee: Committee; members: 
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}
-              className="mt-3 text-xs font-semibold text-navy2 hover:underline"
+              className="mt-3 text-xs font-semibold text-sky hover:underline"
             >
               {open ? "Show less" : `Show all ${responsibilities.length}`}
             </button>

@@ -86,14 +86,14 @@ export function Join() {
   }
 
   return (
-    <section id="join" className="band-navy pattern-dots relative isolate overflow-hidden py-20 text-white sm:py-24">
+    <section id="join" className="band-deep pattern-dots relative isolate overflow-hidden py-20 text-white sm:py-24">
       <div ref={reveal} className="reveal mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-gold-bright uppercase">
+            <p className="text-xs font-semibold tracking-[0.16em] text-sky uppercase">
               Membership
             </p>
-            <h2 className="mt-4 font-serif text-3xl leading-tight font-bold text-white sm:text-4xl">
+            <h2 className="mt-4 font-display text-3xl leading-tight font-bold text-white sm:text-4xl">
               Join the association
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/80">
@@ -109,11 +109,11 @@ export function Join() {
                 { step: "02", title: "Pick a committee", body: "Choose the one whose work matches your interests." },
                 { step: "03", title: "Start contributing", body: "An office-bearer reviews your application and gets in touch." },
               ].map((item) => (
-                <li key={item.step} className="border-t-2 border-gold-bright pt-4">
-                  <span className="font-mono text-xs font-semibold text-gold-bright tabular-nums">
+                <li key={item.step} className="border-t-2 border-sky pt-4">
+                  <span className="font-mono text-xs font-semibold text-sky tabular-nums">
                     {item.step}
                   </span>
-                  <h3 className="mt-2 font-serif text-base font-bold text-white">{item.title}</h3>
+                  <h3 className="mt-2 font-display text-base font-bold text-white">{item.title}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-white/65">{item.body}</p>
                 </li>
               ))}
@@ -125,7 +125,7 @@ export function Join() {
             */}
             {open.length > 0 ? (
               <div className="mt-10 rounded-lg border border-white/15 bg-white/[0.06] p-6">
-                <h3 className="font-serif text-base font-bold text-white">
+                <h3 className="font-display text-base font-bold text-white">
                   Committees with no member listed
                 </h3>
                 <ul className="mt-4 flex flex-wrap gap-2">
@@ -134,7 +134,7 @@ export function Join() {
                       <button
                         type="button"
                         onClick={() => setSelected(committee.id)}
-                        className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:border-gold-bright hover:text-white"
+                        className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:border-sky hover:text-white"
                       >
                         {committee.name}
                       </button>
@@ -147,7 +147,7 @@ export function Join() {
 
           {/* ── The form ──────────────────────────────────────────────────── */}
           <aside className="self-start rounded-lg border border-white/15 bg-white/[0.07] p-7 shadow-float backdrop-blur-sm">
-            <h3 className="font-serif text-xl font-bold text-white">Apply to a committee</h3>
+            <h3 className="font-display text-xl font-bold text-white">Apply to a committee</h3>
 
             {state === "loading" ? (
               <p className="mt-5 animate-pulse text-sm text-white/60">Checking your account…</p>
@@ -160,7 +160,7 @@ export function Join() {
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href={state === "signed-out" ? "/signup/" : "/account/"}
-                    className="rounded-md bg-gold-bright px-5 py-2.5 text-sm font-semibold text-navy-deep"
+                    className="rounded-md bg-sky px-5 py-2.5 text-sm font-bold text-bg transition-colors hover:bg-sky3"
                   >
                     {state === "signed-out" ? "Create an account" : "Finish setting up"}
                   </Link>
@@ -186,7 +186,7 @@ export function Join() {
                     required
                     value={selected}
                     onChange={(e) => setSelected(e.target.value)}
-                    className="mt-2 w-full rounded-md border border-white/25 bg-navy-deep px-3.5 py-2.5 text-sm text-white focus:border-gold-bright focus:outline-none"
+                    className="mt-2 w-full rounded-md border border-white/25 bg-bg px-3.5 py-2.5 text-sm text-white focus:border-sky focus:outline-none"
                   >
                     <option value="">Choose a committee…</option>
                     {choosable.map((committee) => (
@@ -213,7 +213,7 @@ export function Join() {
                     maxLength={2000}
                     rows={5}
                     placeholder="What you would like to work on, and anything relevant you have done before."
-                    className="mt-2 w-full rounded-md border border-white/25 bg-navy-deep px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-gold-bright focus:outline-none"
+                    className="mt-2 w-full rounded-md border border-white/25 bg-bg px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-sky focus:outline-none"
                   />
                 </div>
 
@@ -222,8 +222,8 @@ export function Join() {
                     role="alert"
                     className={`rounded-md border px-3.5 py-2.5 text-sm ${
                       notice.tone === "success"
-                        ? "border-green/40 bg-green/15 text-white"
-                        : "border-red/40 bg-red/15 text-white"
+                        ? "border-emerald/40 bg-emerald/15 text-white"
+                        : "border-rose/40 bg-rose/15 text-white"
                     }`}
                   >
                     {notice.text}
@@ -233,7 +233,7 @@ export function Join() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full rounded-md bg-gold-bright px-5 py-3 text-sm font-semibold text-navy-deep transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+                  className="w-full rounded-md bg-sky px-5 py-3 text-sm font-bold text-bg transition-all hover:-translate-y-0.5 hover:bg-sky3 disabled:opacity-60"
                 >
                   {busy ? "Sending…" : "Send application"}
                 </button>
@@ -242,7 +242,7 @@ export function Join() {
                   <p className="flex flex-wrap items-center gap-2 text-xs text-white/60">
                     <Badge tone="gold">{(mine.data ?? []).length}</Badge>
                     application{(mine.data ?? []).length === 1 ? "" : "s"} so far —{" "}
-                    <Link href="/account/" className="font-semibold text-gold-bright hover:underline">
+                    <Link href="/account/" className="font-semibold text-sky hover:underline">
                       see them on your account
                     </Link>
                   </p>

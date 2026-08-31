@@ -46,10 +46,10 @@ export function LoginForm() {
     <main className="flex min-h-screen items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <Link href="/" className="font-serif text-2xl font-extrabold tracking-tight text-navy2">
+          <Link href="/" className="font-display text-2xl font-extrabold tracking-tight text-sky">
             {SITE.name}
           </Link>
-          <h1 className="mt-4 font-serif text-sm font-bold tracking-tight">Admin sign in</h1>
+          <h1 className="mt-4 font-display text-sm font-bold tracking-tight">Admin sign in</h1>
           <p className="mt-1 text-xs text-muted">Committee members only.</p>
         </div>
 
@@ -78,7 +78,7 @@ export function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword((value) => !value)}
-                className="absolute inset-y-0 end-0 px-3 text-[0.65rem] font-semibold text-muted hover:text-navy2"
+                className="absolute inset-y-0 end-0 px-3 text-[0.65rem] font-semibold text-muted hover:text-sky"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -86,7 +86,7 @@ export function LoginForm() {
           </Field>
 
           {error ? (
-            <p role="alert" className="rounded-lg border border-red/25 bg-red/10 px-3 py-2 text-xs text-red">
+            <p role="alert" className="rounded-lg border border-rose/25 bg-rose/10 px-3 py-2 text-xs text-rose">
               {error}
             </p>
           ) : null}
@@ -97,7 +97,7 @@ export function LoginForm() {
         </form>
 
         <p className="mt-6 text-center text-xs text-muted">
-          <Link href="/" className="hover:text-navy2">
+          <Link href="/" className="hover:text-sky">
             ← Back to the site
           </Link>
         </p>

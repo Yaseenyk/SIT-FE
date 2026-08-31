@@ -81,7 +81,7 @@ export function Gallery() {
   const current = lightbox ? lightbox.items[lightbox.index] : null;
 
   return (
-    <section id="gallery" className="border-b border-rule py-16 sm:py-20">
+    <section id="gallery" className="border-b border-line py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           eyebrow="Gallery"
@@ -130,7 +130,7 @@ export function Gallery() {
                 />
                 {/* The scrim is always on, not hover-only: a caption that appears only on
                     hover is invisible on a touch screen. */}
-                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy/90 to-transparent p-3 pt-8 text-start">
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-sky2/90 to-transparent p-3 pt-8 text-start">
                   <span
                     className={cn("block truncate font-semibold text-white",
                       index === 0 ? "text-sm" : "text-xs",
@@ -140,7 +140,7 @@ export function Gallery() {
                   </span>
                 </span>
                 {album ? (
-                  <span className="absolute end-2 top-2 rounded bg-navy/85 px-2 py-0.5 text-[0.65rem] font-semibold text-white">
+                  <span className="absolute end-2 top-2 rounded bg-sky2/85 px-2 py-0.5 text-[0.65rem] font-semibold text-white">
                     {album.length} photos
                   </span>
                 ) : null}
@@ -156,7 +156,7 @@ export function Gallery() {
           aria-modal="true"
           aria-label={current.title}
           onClick={close}
-          className="fixed inset-0 z-70 flex flex-col items-center justify-center gap-5 bg-navy/95 p-4"
+          className="fixed inset-0 z-70 flex flex-col items-center justify-center gap-5 bg-bg/95 p-4 backdrop-blur-sm"
         >
           <img
             src={current.url}
@@ -165,7 +165,7 @@ export function Gallery() {
             className="max-h-[72vh] max-w-full rounded object-contain"
           />
           <div className="text-center">
-            <p className="font-serif text-base font-bold text-white">{current.title}</p>
+            <p className="font-display text-base font-bold text-white">{current.title}</p>
             {current.description ? (
               <p className="mx-auto mt-1.5 max-w-lg text-sm text-white/70">{current.description}</p>
             ) : null}

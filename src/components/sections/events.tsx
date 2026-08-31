@@ -54,7 +54,7 @@ export function Events() {
   );
 
   return (
-    <section id="events" className="border-t border-rule py-20 sm:py-24">
+    <section id="events" className="border-t border-line py-20 sm:py-24">
       <div ref={reveal} className="reveal mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           eyebrow="Activities"
@@ -136,7 +136,7 @@ function EventCard({
             loading="lazy"
             className="size-full object-cover"
           />
-          {past ? <div className="absolute inset-0 bg-navy-deep/35" /> : null}
+          {past ? <div className="absolute inset-0 bg-bg/35" /> : null}
         </div>
       ) : null}
 
@@ -145,7 +145,7 @@ function EventCard({
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h3 className="font-serif text-lg leading-snug font-bold text-ink">{event.title}</h3>
+            <h3 className="font-display text-lg leading-snug font-bold text-ink">{event.title}</h3>
             {event.tag ? <Badge tone={past ? "muted" : "green"}>{event.tag}</Badge> : null}
           </div>
 
@@ -168,7 +168,7 @@ function EventCard({
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-semibold text-navy2 hover:underline"
+                className="text-sm font-semibold text-sky hover:underline"
               >
                 {past ? "Read more" : "Details"} ↗
               </a>
@@ -209,7 +209,7 @@ function RegisterButton({
     return (
       <Link
         href={state === "signed-out" ? "/login/" : "/account/"}
-        className="rounded-md border border-rule-strong px-4 py-2 text-sm font-semibold text-navy2 transition-colors hover:bg-navy-tint"
+        className="rounded-md border border-line2 px-4 py-2 text-sm font-semibold text-sky transition-colors hover:bg-sky-tint"
       >
         Sign in to register
       </Link>
@@ -235,11 +235,11 @@ function RegisterButton({
               setBusy(false);
             }
           }}
-          className="text-xs font-semibold text-muted hover:text-red disabled:opacity-50"
+          className="text-xs font-semibold text-muted hover:text-rose disabled:opacity-50"
         >
           {busy ? "Cancelling…" : "Cancel"}
         </button>
-        {error ? <span className="text-xs text-red">{error}</span> : null}
+        {error ? <span className="text-xs text-rose">{error}</span> : null}
       </span>
     );
   }
@@ -263,11 +263,11 @@ function RegisterButton({
             setBusy(false);
           }
         }}
-        className="rounded-md bg-navy px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-navy2 disabled:opacity-50"
+        className="rounded-md bg-sky2 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky disabled:opacity-50"
       >
         {busy ? "Registering…" : "Register"}
       </button>
-      {error ? <span className="text-xs text-red">{error}</span> : null}
+      {error ? <span className="text-xs text-rose">{error}</span> : null}
     </span>
   );
 }

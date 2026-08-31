@@ -53,7 +53,7 @@ export function ApplicationsPanel() {
       ) : queue.error ? (
         <ErrorNotice error={queue.error} onRetry={queue.reload} />
       ) : (queue.data ?? []).length === 0 ? (
-        <p className="rounded-xl border border-dashed border-rule px-6 py-12 text-center text-xs text-muted">
+        <p className="rounded-xl border border-dashed border-line px-6 py-12 text-center text-xs text-muted">
           {tab === "PENDING"
             ? "Nothing waiting for review."
             : "No applications in this category."}
@@ -101,7 +101,7 @@ function ApplicationCard({
           </p>
           <p className="mt-0.5 text-xs text-muted">
             {application.applicantEmail ? (
-              <a href={`mailto:${application.applicantEmail}`} className="hover:text-navy2">
+              <a href={`mailto:${application.applicantEmail}`} className="hover:text-sky">
                 {application.applicantEmail}
               </a>
             ) : null}
@@ -136,7 +136,7 @@ function ApplicationCard({
       </p>
 
       {pending ? (
-        <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-rule pt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-line pt-4">
           <label htmlFor={`role-${application.id}`} className="sr-only">
             Role on the roster
           </label>
@@ -191,7 +191,7 @@ function ApplicationCard({
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-semibold text-navy2 hover:underline"
+              className="text-xs font-semibold text-sky hover:underline"
             >
               Email them
             </a>

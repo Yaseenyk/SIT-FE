@@ -30,6 +30,13 @@ export interface Committee {
   memberCount: number;
 }
 
+/**
+ * A member as the PUBLIC site sees them. No contact details, deliberately.
+ *
+ * The roster is imported from an internal record of students' personal mobile numbers and
+ * mail addresses, and `GET /members` is public. Contacts live on {@link AdminMember},
+ * behind `/members/admin`.
+ */
 export interface Member {
   id: string;
   name: string;
@@ -39,9 +46,14 @@ export interface Member {
   academicYear: string | null;
   linkedinUrl: string | null;
   githubUrl: string | null;
-  email: string | null;
   photoUrl: string | null;
   order: number;
+}
+
+/** The same member with contact details — dashboard only. */
+export interface AdminMember extends Member {
+  email: string | null;
+  phone: string | null;
 }
 
 export type EventStatus = "upcoming" | "past";

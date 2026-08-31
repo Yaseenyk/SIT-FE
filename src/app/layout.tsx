@@ -1,32 +1,31 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
+import { Exo_2, JetBrains_Mono, Orbitron } from "next/font/google";
 import { SITE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 /**
- * A text serif for headings, Inter for everything else.
+ * The three families the original site loaded from a Google Fonts <link>.
  *
- * This pairing is doing more work than any layout change. The site previously set every
- * heading in a geometric display face with a gradient fill, which is the typographic
- * signature of a generated landing page — and a university department wearing it read as
- * a crypto product. Source Serif 4 is a workhorse text serif; it is what academic
- * institutions actually use, and it makes the page look like it belongs to a college
- * before a single word is read.
+ * Orbitron for headings and the wordmark, Exo 2 for everything else, JetBrains Mono for
+ * stats and labels — restored after a spell with a text serif, which suited an
+ * institutional white ground and does not suit this one.
  *
  * next/font self-hosts all three: the files are emitted into the static export and served
  * from the site's own origin. That removes a render-blocking request to a third party,
  * removes the layout shift while it resolves, and means the site keeps its typography on
  * a network that blocks fonts.googleapis.com.
  */
-const sourceSerif = Source_Serif_4({
+const orbitron = Orbitron({
   subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-source-serif",
+  weight: ["400", "600", "700", "900"],
+  variable: "--font-orbitron",
   display: "swap",
 });
-const inter = Inter({
+
+const exo2 = Exo_2({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-exo2",
   display: "swap",
 });
 
@@ -102,7 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // --font-sans: var(--font-exo2) at :root, and a custom property is substituted where
     // it is DECLARED — a variable that only exists on <body> resolves to nothing at :root,
     // and every heading silently falls back to the browser default. No error, no warning.
-    <html lang="en" className={`${inter.variable} ${sourceSerif.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${orbitron.variable} ${exo2.variable} ${jetbrains.variable}`}>
       <body>
         <script
           type="application/ld+json"

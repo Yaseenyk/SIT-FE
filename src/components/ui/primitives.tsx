@@ -44,7 +44,7 @@ export function SectionHeading({
           <p
             className={cn(
               "mb-3 text-xs font-semibold tracking-[0.16em] uppercase",
-              onDark ? "text-gold-bright" : "text-gold",
+              onDark ? "text-sky" : "text-sky",
             )}
           >
             {eyebrow}
@@ -84,8 +84,10 @@ export function Card({ className, children, ...rest }: React.HTMLAttributes<HTML
 /**
  * A small status/category label.
  *
- * <p>Solid-tinted with a matching border, not a glowing pill. Tones are semantic: navy is
- * structural, green means active/upcoming, amber means attention, red means stop.
+ * <p>Tones are semantic and that is the whole point of them: `navy` is structural (it is
+ * the sky accent here), emerald means active or upcoming, gold means attention, rose
+ * means stop. Gold survives the palette's otherwise sky-only accent rule precisely
+ * because a status colour that matches the brand colour communicates nothing.
  */
 export function Badge({
   children,
@@ -99,13 +101,13 @@ export function Badge({
   // Full class strings, never `bg-${tone}-soft` — Tailwind scans source text, so a
   // constructed class name is absent from the output CSS and the badge renders unstyled.
   const tones = {
-    navy: "bg-navy-tint text-navy2 border-navy2/20",
+    navy: "bg-sky-tint text-sky border-sky/20",
     gold: "bg-gold-soft text-gold border-gold/30",
-    clay: "bg-clay-soft text-clay border-clay/25",
-    green: "bg-green-soft text-green border-green/25",
-    amber: "bg-amber-soft text-amber border-amber/25",
-    red: "bg-red-soft text-red border-red/25",
-    muted: "bg-sunken text-muted border-rule",
+    clay: "bg-rose-soft text-rose border-rose/25",
+    green: "bg-emerald-soft text-emerald border-emerald/25",
+    amber: "bg-gold-soft text-gold border-gold/25",
+    red: "bg-rose-soft text-rose border-rose/25",
+    muted: "bg-card2 text-muted border-line",
   } as const;
 
   return (
@@ -134,7 +136,7 @@ export function DateBlock({ iso, className }: { iso: string; className?: string 
     return (
       <div
         className={cn(
-          "flex size-16 shrink-0 flex-col items-center justify-center rounded-md border border-rule bg-sunken",
+          "flex size-16 shrink-0 flex-col items-center justify-center rounded-md border border-line bg-card2",
           className,
         )}
       >
@@ -145,14 +147,14 @@ export function DateBlock({ iso, className }: { iso: string; className?: string 
   return (
     <div
       className={cn(
-        "flex size-16 shrink-0 flex-col items-center justify-center overflow-hidden rounded-md bg-navy text-white shadow-raise",
+        "flex size-16 shrink-0 flex-col items-center justify-center overflow-hidden rounded-md bg-sky2 text-white shadow-raise",
         className,
       )}
     >
-      <span className="w-full bg-gold py-0.5 text-center text-[0.6rem] font-bold tracking-[0.1em] text-navy-deep uppercase">
+      <span className="w-full bg-sky py-0.5 text-center text-[0.6rem] font-bold tracking-[0.1em] text-bg uppercase">
         {date.toLocaleDateString("en-IN", { month: "short" })}
       </span>
-      <span className="flex flex-1 items-center font-serif text-2xl leading-none font-bold tabular-nums">
+      <span className="flex flex-1 items-center font-display text-2xl leading-none font-bold tabular-nums">
         {date.getDate()}
       </span>
     </div>
@@ -160,7 +162,7 @@ export function DateBlock({ iso, className }: { iso: string; className?: string 
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-md bg-sunken", className)} aria-hidden />;
+  return <div className={cn("animate-pulse rounded-md bg-card2", className)} aria-hidden />;
 }
 
 export function EmptyState({
@@ -173,12 +175,12 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="col-span-full rounded-lg border border-dashed border-rule-strong bg-surface px-6 py-16 text-center">
+    <div className="col-span-full rounded-lg border border-dashed border-line2 bg-bg2 px-6 py-16 text-center">
       <div
         aria-hidden
-        className="image-placeholder mx-auto mb-5 size-14 rounded-lg border border-rule"
+        className="image-placeholder mx-auto mb-5 size-14 rounded-lg border border-line"
       />
-      <p className="font-serif text-lg font-bold text-ink">{title}</p>
+      <p className="font-display text-lg font-bold text-ink">{title}</p>
       {hint ? (
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{hint}</p>
       ) : null}
@@ -218,7 +220,7 @@ export function Avatar({
         alt=""
         loading="lazy"
         className={cn(
-          "shrink-0 rounded-full border-2 border-paper object-cover shadow-raise",
+          "shrink-0 rounded-full border-2 border-card object-cover shadow-raise",
           sizes[size],
         )}
       />
@@ -228,7 +230,7 @@ export function Avatar({
     <span
       aria-hidden
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full border-2 border-paper bg-navy font-semibold text-white shadow-raise",
+        "flex shrink-0 items-center justify-center rounded-full border-2 border-card bg-sky2 font-semibold text-white shadow-raise",
         sizes[size],
       )}
     >
@@ -246,7 +248,7 @@ export function Avatar({
  */
 export function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="border-t border-rule py-3.5 first:border-t-0 first:pt-0">
+    <div className="border-t border-line py-3.5 first:border-t-0 first:pt-0">
       <dt className="text-[0.68rem] font-semibold tracking-[0.12em] text-muted uppercase">
         {label}
       </dt>

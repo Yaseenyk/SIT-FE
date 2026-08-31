@@ -48,7 +48,7 @@ function Gate() {
         footer={
           <>
             Don&apos;t have an account?{" "}
-            <Link href="/signup/" className="font-semibold text-navy2 hover:underline">
+            <Link href="/signup/" className="font-semibold text-sky hover:underline">
               Create one
             </Link>
           </>

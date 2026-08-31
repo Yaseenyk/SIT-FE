@@ -74,17 +74,17 @@ export function Navbar() {
       </div>
 
       {/* Band 2 — the masthead. Association, department, institute, in that order. */}
-      <div className="border-b border-rule bg-page">
+      <div className="border-b border-line bg-bg">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
           <Link href="/" className="flex items-center gap-3.5" onClick={() => setOpen(false)}>
             <span
               aria-hidden
-              className="flex size-11 shrink-0 items-center justify-center rounded-sm bg-navy font-serif text-[0.7rem] leading-none font-bold text-white"
+              className="flex size-11 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-sky2 to-cyan font-display text-[0.6rem] leading-none font-bold text-bg"
             >
               AISA
             </span>
             <span className="leading-tight">
-              <span className="block font-serif text-lg font-bold text-ink sm:text-xl">
+              <span className="block font-display text-lg font-bold text-ink sm:text-xl">
                 {SITE.longName}
               </span>
               <span className="block text-[0.72rem] text-muted">
@@ -98,7 +98,7 @@ export function Navbar() {
             aria-expanded={open}
             aria-controls="primary-nav"
             aria-label="Toggle navigation"
-            className="rounded border border-rule-strong px-3 py-2 text-ink lg:hidden"
+            className="rounded border border-line2 px-3 py-2 text-ink lg:hidden"
           >
             {open ? "✕" : "☰"}
           </button>
@@ -106,17 +106,22 @@ export function Navbar() {
       </div>
 
       {/* Band 3 — the navigation itself, on the institutional navy. */}
-      <nav aria-label="Main" className="hidden border-b border-navy3 bg-navy2 lg:block">
+      {/* Dark and translucent, as the original's fixed bar was — the accent belongs on
+          the active item, not spread across the whole band. */}
+      <nav
+        aria-label="Main"
+        className="hidden border-b border-line bg-bg2/85 backdrop-blur-xl lg:block"
+      >
         <ul className="mx-auto flex max-w-6xl items-stretch px-4 sm:px-6">
           {SECTIONS.map((section) => (
             <li key={section.id}>
               <a
                 href={`#${section.id}`}
                 aria-current={active === section.id ? "true" : undefined}
-                className={cn("flex h-11 items-center border-b-[3px] px-4 text-[0.82rem] font-semibold tracking-wide text-white/85 transition-colors",
+                className={cn("flex h-11 items-center border-b-[3px] px-4 text-[0.82rem] font-semibold tracking-wide transition-colors",
                   active === section.id
-                    ? "border-gold bg-white/10 text-white"
-                    : "border-transparent hover:bg-white/10 hover:text-white",
+                    ? "border-sky bg-sky-tint text-sky"
+                    : "border-transparent text-muted hover:bg-sky-tint hover:text-ink",
                 )}
               >
                 {section.label}
@@ -128,14 +133,14 @@ export function Navbar() {
 
       {/* `hidden` rather than conditional rendering, so the links stay in the DOM for
           in-page anchors and the panel does not remount on every toggle. */}
-      <div id="primary-nav" hidden={!open} className="border-b border-rule bg-page lg:hidden">
+      <div id="primary-nav" hidden={!open} className="border-b border-line bg-bg lg:hidden">
         <ul className="mx-auto max-w-6xl px-4 py-2 sm:px-6">
           {SECTIONS.map((section) => (
             <li key={section.id}>
               <a
                 href={`#${section.id}`}
                 onClick={() => setOpen(false)}
-                className="block border-b border-rule py-3 text-sm font-semibold text-ink"
+                className="block border-b border-line py-3 text-sm font-semibold text-ink"
               >
                 {section.label}
               </a>
@@ -144,7 +149,7 @@ export function Navbar() {
           <li>
             <AccountLink
               onNavigate={() => setOpen(false)}
-              className="block py-3 text-sm font-semibold text-navy2"
+              className="block py-3 text-sm font-semibold text-sky"
             />
           </li>
         </ul>

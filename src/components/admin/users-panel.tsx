@@ -59,7 +59,7 @@ export function UsersPanel() {
           onChange={(event) => setFilter(event.target.value)}
           placeholder="Search by name, email or roll number"
           aria-label="Search accounts"
-          className="w-full max-w-sm rounded-lg border border-rule bg-surface px-3 py-2 text-sm"
+          className="w-full max-w-sm rounded-lg border border-line bg-bg2 px-3 py-2 text-sm"
         />
         <p className="text-xs text-muted">
           {(accounts.data ?? []).length} account
@@ -73,12 +73,12 @@ export function UsersPanel() {
       ) : accounts.error ? (
         <ErrorNotice error={accounts.error} onRetry={accounts.reload} />
       ) : rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-rule px-6 py-12 text-center text-xs text-muted">
+        <p className="rounded-xl border border-dashed border-line px-6 py-12 text-center text-xs text-muted">
           {filter ? "No account matches that search." : "Nobody has signed up yet."}
         </p>
       ) : (
         <TableShell>
-          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Person</th>
               <th className="px-4 py-3 text-start">Year / roll</th>
@@ -126,7 +126,7 @@ function UserRow({
   const locked = isSelf || lastAdmin;
 
   return (
-    <tr className={`border-t border-rule ${suspended ? "opacity-60" : ""}`}>
+    <tr className={`border-t border-line ${suspended ? "opacity-60" : ""}`}>
       <td className="px-4 py-3">
         <span className="flex items-center gap-3">
           <Avatar src={user.photoUrl} name={user.name ?? user.email ?? "?"} size="sm" />

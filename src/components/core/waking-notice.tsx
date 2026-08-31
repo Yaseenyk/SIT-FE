@@ -33,12 +33,12 @@ export function WakingNotice() {
     <div
       role="status"
       aria-live="polite"
-      className="border-b border-amber/25 bg-amber-soft"
+      className="border-b border-gold/25 bg-gold-soft"
     >
-      <p className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 text-sm text-amber sm:px-6">
+      <p className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 text-sm text-sky sm:px-6">
         <span
           aria-hidden
-          className="size-2 shrink-0 animate-pulse rounded-full bg-amber"
+          className="size-2 shrink-0 animate-pulse rounded-full bg-gold"
         />
         Waking the server — the site is hosted on a free tier that sleeps when idle. This
         takes up to a minute the first time, then everything is instant.

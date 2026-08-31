@@ -25,7 +25,7 @@ export function About() {
   const advisory = (committees.data ?? []).find((c) => c.type === "advisory") ?? null;
 
   return (
-    <section id="about" className="border-b border-rule py-16 sm:py-20">
+    <section id="about" className="border-b border-line py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
           <div className="prose-block">
@@ -45,13 +45,13 @@ export function About() {
 
             {features.length > 0 ? (
               <>
-                <h3 className="mt-10 mb-4 font-serif text-lg font-bold text-ink">
+                <h3 className="mt-10 mb-4 font-display text-lg font-bold text-ink">
                   What the association does
                 </h3>
                 <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
                   {features.map((feature, index) => (
-                    <div key={feature.title ?? index} className="border-l-2 border-gold pl-4">
-                      <h4 className="font-serif text-base font-bold text-ink">{feature.title}</h4>
+                    <div key={feature.title ?? index} className="border-l-2 border-sky pl-4">
+                      <h4 className="font-display text-base font-bold text-ink">{feature.title}</h4>
                       <p className="mt-1.5 text-sm leading-relaxed text-body">
                         {feature.description}
                       </p>
@@ -65,7 +65,7 @@ export function About() {
           <aside className="space-y-8">
             {/* A labelled facts panel — the "at a glance" box college pages always carry. */}
             <div className="card p-6">
-              <h3 className="font-serif text-base font-bold text-ink">At a glance</h3>
+              <h3 className="font-display text-base font-bold text-ink">At a glance</h3>
               <dl className="mt-3">
                 <Fact label="Department">Computer Science &amp; Engineering (AI &amp; ML)</Fact>
                 <Fact label="Institute">{SITE.institute}</Fact>
@@ -78,7 +78,7 @@ export function About() {
 
             {advisory ? (
               <div className="card p-6">
-                <h3 className="font-serif text-base font-bold text-ink">{advisory.name}</h3>
+                <h3 className="font-display text-base font-bold text-ink">{advisory.name}</h3>
                 <p className="mt-1 text-sm text-muted">
                   Academic and administrative oversight of the association.
                 </p>

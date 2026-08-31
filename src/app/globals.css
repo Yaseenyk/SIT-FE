@@ -8,104 +8,99 @@
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════
- * AISA — institutional, but not austere
+ * AISA — the original theme, restored
  *
- * Two failed directions got us here, and both are worth recording because the fix
- * for one caused the other.
+ * These are the exact custom properties from `AISA_Website .html`: the same
+ * hex values, the same three type families, the same deep-navy ground with a
+ * sky-blue accent. Reverted here deliberately after two other directions.
  *
- * The FIRST build was a near-black page with cyan→purple gradient headings, glowing
- * cards, an animated particle field and emoji standing in for icons. Every one of
- * those is a marker of a generated SaaS landing page. No college looks like that.
+ * WHAT THE OTHER TWO WERE, SO NOBODY REPEATS THEM
  *
- * The correction stripped all of it: white ground, one accent, hairline rules, flat
- * panels. That read as a government form. Removing ornament removed the interest
- * along with it, because nothing was put back in its place.
+ * A white institutional build came first as a correction to this one, and read
+ * as a government form — flat panels, hairline rules, nothing raised. A warmer
+ * build followed and fixed the flatness but kept the light ground.
  *
- * What actually makes a good college site look good is not ornament — it is
- * DEPTH, WARMTH and PICTURES:
+ * WHAT IS KEPT FROM THEM, ON PURPOSE
  *
- *   · a warm off-white ground rather than #fff, so the page has a temperature
- *   · real elevation — layered shadows, panels that overlap their section edge
- *   · photographs given room, and designed placeholders where there are none yet
- *   · a wide type scale, so a page has a loud voice and a quiet one
- *   · colour that varies per section instead of one accent used four times
+ * Two things, both requested, and neither of them a colour:
  *
- * The palette is still the parent institute's (bsiet.org): deep navy and gold. It
- * is used with far more range here — tints, deep bands, gradients between the two
- * navies — rather than being rationed down to hairlines.
+ *   · ELEVATION as a scale. The original had one flat border everywhere, so no
+ *     card ever sat above another and the eye had no route through the page.
+ *     The shadows below are tuned for a dark ground — a black shadow is
+ *     invisible on #020c18, so each one pairs a darkening with a faint sky
+ *     spill, which is how depth reads on dark.
+ *
+ *   · The REVEAL on scroll and the richer content blocks (named people on the
+ *     committee cards, dated event cards). Structure, not styling.
+ *
+ * The accent is `sky`, and it does a lot of work here — this is a dark theme,
+ * so the accent IS the light source. That is the opposite of the institutional
+ * build's rationing and it is correct for this ground.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 @theme {
-  /* ── Ground ─────────────────────────────────────────────────────────────── */
+  /* ── Surfaces, darkest to lightest ──────────────────────────────────────── */
+  --color-bg: #020c18;
+  --color-bg2: #041424;
+  --color-surface: #061828;
+  --color-card: #071e30;
+  --color-card2: #082236;
+
+  /* ── The accent. `sky` is the interactive colour and the brand colour both. ─ */
+  --color-sky: #38bdf8;
+  --color-sky2: #0ea5e9;
+  --color-sky3: #7dd3fc;
+  --color-cyan: #22d3ee;
+  /* A sky wash for tinted panels — the dark-ground equivalent of a pale fill. */
+  --color-sky-tint: rgb(56 189 248 / 0.1);
+
+  /* ── Status. Semantic, and never used decoratively. ─────────────────────── */
+  --color-emerald: #10b981;
+  --color-emerald-soft: rgb(16 185 129 / 0.13);
+  --color-gold: #f59e0b;
+  --color-gold-soft: rgb(245 158 11 / 0.13);
+  --color-rose: #f43f5e;
+  --color-rose-soft: rgb(244 63 94 / 0.13);
+
+  /* ── Text and lines ─────────────────────────────────────────────────────── */
+  --color-ink: #e0f2fe;
+  /* Body copy sits below `ink` so headings still lead on a dark ground, where
+     everything is lower-contrast than it would be on white. */
+  --color-body: #b9d9ee;
+  --color-muted: #5d8fad;
+  --color-line: rgb(56 189 248 / 0.12);
+  --color-line2: rgb(56 189 248 / 0.25);
+
   /*
-   * Not #ffffff. A page of pure white with black text is the highest-contrast,
-   * coldest thing a screen can show; every printed prospectus is warmer than that.
-   * The half-degree of warmth here is most of why the page stops looking clinical.
+   * Three families, as in the original:
+   *   display — Orbitron, for the wordmark and section headings
+   *   sans    — Exo 2, for everything else
+   *   mono    — JetBrains Mono, for stats and code-ish labels
+   * The --font-* variables are set by next/font in layout.tsx.
    */
-  --color-page: #fdfcfa;
-  --color-surface: #f5f2ec; /* alternating band — warm, not grey */
-  --color-sunken: #ece7dd; /* table headers, wells */
-  --color-paper: #ffffff; /* cards, which sit ABOVE the ground */
-
-  /* ── Institutional navy. The structural colour. ─────────────────────────── */
-  --color-navy-deep: #041a33; /* the dark end of the hero gradient */
-  --color-navy: #07294d;
-  --color-navy2: #133984; /* the institute's link/heading blue */
-  --color-navy3: #2d5185;
-  --color-navy-tint: #eaeff7;
-
-  /* ── Gold. Now a real accent, not a rationed hairline. ──────────────────── */
-  --color-gold: #b3861a;
-  --color-gold-bright: #e0b344; /* on navy, where the darker gold disappears */
-  --color-gold-soft: #fbf3e0;
+  --font-display: var(--font-orbitron), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-exo2), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", monospace;
 
   /*
-   * A third colour, for the places where navy-and-gold alone becomes monotonous:
-   * achievement cards, the gallery, per-committee accents. Terracotta because it
-   * sits beside gold without competing, and because it is warm — a cool third
-   * colour would undo the ground.
-   */
-  --color-clay: #a64b2a;
-  --color-clay-soft: #fbeee8;
-
-  /* ── Status. Semantic only, never decorative. ───────────────────────────── */
-  --color-green: #0f7a4a;
-  --color-green-soft: #e6f4ec;
-  --color-amber: #a86a12;
-  --color-amber-soft: #fdf1de;
-  --color-red: #b3261e;
-  --color-red-soft: #fdeceb;
-
-  /* ── Text and rules ─────────────────────────────────────────────────────── */
-  --color-ink: #171d26;
-  --color-body: #3f4854;
-  --color-muted: #6d7683;
-  --color-rule: #e3ddd2;
-  --color-rule-strong: #cabfae;
-
-  /*
-   * Elevation, as a scale rather than one shadow.
+   * Elevation, kept from the build that replaced this one.
    *
-   * Flat panels on a flat ground was the whole problem with the previous build:
-   * with nothing raised, nothing is more important than anything else, and the eye
-   * has no route through the page. These are warm-tinted rather than pure black,
-   * so a raised card reads as paper on a desk instead of as a UI effect.
+   * On a dark ground a black shadow does nothing — there is nothing darker than
+   * #020c18 to cast onto. Each step therefore darkens AND spills a little sky,
+   * which is what actually separates a raised surface from the page here.
    */
-  --shadow-raise: 0 1px 2px rgb(43 32 18 / 0.05), 0 2px 6px rgb(43 32 18 / 0.04);
-  --shadow-lift: 0 2px 4px rgb(43 32 18 / 0.05), 0 8px 20px rgb(43 32 18 / 0.07);
-  --shadow-float: 0 8px 16px rgb(43 32 18 / 0.07), 0 24px 48px rgb(43 32 18 / 0.11);
+  --shadow-raise: 0 1px 2px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(56 189 248 / 0.05);
+  --shadow-lift: 0 4px 12px rgb(0 0 0 / 0.45), 0 0 22px -8px rgb(56 189 248 / 0.35);
+  --shadow-float: 0 12px 32px rgb(0 0 0 / 0.5), 0 0 44px -12px rgb(56 189 248 / 0.45);
 
-  --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
-
-  --spacing-nav: 4.5rem;
+  /* The fixed navbar height. Section scroll offsets are derived from it. */
+  --spacing-nav: 4.375rem; /* 70px */
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Every in-page link would otherwise land under the sticky header. */
+    /* Every in-page link would otherwise land under the fixed header. */
     scroll-padding-top: calc(var(--spacing-nav) + 1rem);
     -webkit-text-size-adjust: 100%;
   }
@@ -128,7 +123,7 @@
   }
 
   body {
-    background-color: var(--color-page);
+    background-color: var(--color-bg);
     color: var(--color-body);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -139,29 +134,32 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     color: var(--color-ink);
+    /* Orbitron is a wide display face; without negative tracking it sprawls. */
+    letter-spacing: -0.01em;
   }
 
-  /*
-   * Display sizes get negative tracking; text sizes do not.
-   *
-   * Source Serif is drawn for body text, so at 12px of tracking-neutral it is
-   * correct — but at 56px the same spacing looks loose and amateurish. This is the
-   * cheapest single thing that makes large type look set rather than typed.
-   */
-  h1,
-  .display {
-    letter-spacing: -0.02em;
+  /* The original's sky-blue scrollbar, which is a real part of its character. */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-sky2);
+    border-radius: 3px;
   }
 
   ::selection {
-    background-color: rgb(19 57 132 / 0.15);
+    background-color: rgb(56 189 248 / 0.28);
+    color: #ffffff;
   }
 
   /* The focus ring is the keyboard user's cursor. Never removed. */
   :focus-visible {
-    outline: 2px solid var(--color-navy2);
+    outline: 2px solid var(--color-sky);
     outline-offset: 2px;
   }
 }
@@ -169,32 +167,35 @@
 @layer components {
   /* ── Section marker ─────────────────────────────────────────────────────── */
 
-  /*
-   * A short gold rule above a section heading — the one piece of pure ornament,
-   * kept because it does a real job: it marks where a section begins on a long
-   * single-column page.
-   */
   .section-rule::before {
     content: "";
     display: block;
     width: 2.5rem;
     height: 3px;
-    background-color: var(--color-gold);
+    background: linear-gradient(90deg, var(--color-sky), var(--color-cyan));
     margin-bottom: 1rem;
+  }
+
+  /*
+   * The original's gradient headline treatment.
+   *
+   * Restored because it is one of the most recognisable things about this
+   * design — but still applied to one or two words, never a whole title:
+   * a fully gradient-filled heading loses too much contrast to read.
+   */
+  .text-gradient {
+    background: linear-gradient(120deg, var(--color-sky3), var(--color-cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   /* ── Cards ──────────────────────────────────────────────────────────────── */
 
-  /*
-   * White paper on the warm ground, with a shadow rather than a hard border.
-   *
-   * The border is still there but very light: the shadow does the separating and
-   * the border only keeps the edge crisp where a card meets a pale background.
-   */
   .card {
-    background-color: var(--color-paper);
-    border: 1px solid var(--color-rule);
-    border-radius: 0.5rem;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
     box-shadow: var(--shadow-raise);
   }
 
@@ -208,74 +209,68 @@
   .card-hover:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-lift);
-    border-color: var(--color-rule-strong);
+    border-color: var(--color-line2);
   }
 
-  /*
-   * A card whose top edge is a coloured bar.
-   *
-   * Used for committees, where a dozen otherwise-identical cards sit in a grid and
-   * nothing distinguishes one from another. The bar colour is set per card.
-   */
-  .card-topped {
-    border-top: 3px solid var(--color-gold);
-  }
-
-  /* ── The dark bands ─────────────────────────────────────────────────────── */
+  /* ── The deep bands ─────────────────────────────────────────────────────── */
 
   /*
    * The hero and the join band.
    *
-   * A gradient between the two navies rather than one flat fill, plus a very faint
-   * dot grid. Neither is decoration for its own sake: a flat 1400px-wide block of
-   * one colour is the single most obviously "template" thing on a page, and the
-   * gradient gives it a light source.
+   * The original's radial wash, kept: a sky glow off-centre behind the content,
+   * which is what stops a full-width block of #020c18 reading as a dead area.
    */
-  .band-navy {
-    background-color: var(--color-navy);
+  .band-deep {
+    background-color: var(--color-bg);
     background-image:
-      radial-gradient(ellipse 90% 70% at 15% 0%, rgb(45 81 133 / 0.55), transparent 60%),
-      linear-gradient(160deg, var(--color-navy) 0%, var(--color-navy-deep) 100%);
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgb(14 165 233 / 0.14), transparent 70%),
+      linear-gradient(160deg, var(--color-bg2) 0%, var(--color-bg) 100%);
   }
 
   /*
-   * A 24px dot grid, drawn in CSS rather than shipped as an image.
-   *
-   * Applied to a ::before so it can sit under content at low opacity without every
-   * child needing a stacking context.
+   * The original's faint 64px graph-paper grid, masked to fade out down the page so it
+   * never competes with the content below the fold.
    */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(56 189 248 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(56 189 248 / 0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  }
+
+  /* A 24px dot grid under content, at low enough opacity to read as texture. */
   .pattern-dots::before {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.11) 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, rgb(56 189 248 / 0.13) 1px, transparent 0);
     background-size: 24px 24px;
     pointer-events: none;
   }
 
-  /* The thin band above the header carrying contact details — a college staple. */
+  /* The thin band above the header carrying contact details. */
   .utility-bar {
-    background-color: var(--color-navy-deep);
-    color: #cfdaea;
+    background-color: #010812;
+    color: var(--color-muted);
+    border-bottom: 1px solid var(--color-line);
   }
 
   /* ── Images ─────────────────────────────────────────────────────────────── */
 
   /*
-   * The stand-in for a photograph that has not been uploaded yet.
-   *
-   * The gallery is empty, and it will be empty for whoever deploys this before the
-   * committee gets round to adding pictures. A grey box with a broken-image icon
-   * makes a site look abandoned; a deliberate navy-and-gold weave reads as design
-   * and disappears the moment a real image replaces it.
+   * The stand-in for a photograph that has not been uploaded yet. The gallery is
+   * empty and will be for whoever deploys this; a grey box makes a site look
+   * abandoned, so this is a deliberate sky weave that disappears the moment a
+   * real image replaces it.
    */
   .image-placeholder {
-    background-color: var(--color-navy-tint);
+    background-color: var(--color-card2);
     background-image:
-      linear-gradient(135deg, rgb(19 57 132 / 0.07) 25%, transparent 25%),
-      linear-gradient(225deg, rgb(19 57 132 / 0.07) 25%, transparent 25%),
-      linear-gradient(45deg, rgb(179 134 26 / 0.07) 25%, transparent 25%),
-      linear-gradient(315deg, rgb(179 134 26 / 0.07) 25%, transparent 25%);
+      linear-gradient(135deg, rgb(56 189 248 / 0.1) 25%, transparent 25%),
+      linear-gradient(225deg, rgb(56 189 248 / 0.1) 25%, transparent 25%),
+      linear-gradient(45deg, rgb(34 211 238 / 0.08) 25%, transparent 25%),
+      linear-gradient(315deg, rgb(34 211 238 / 0.08) 25%, transparent 25%);
     background-position:
       10px 0,
       10px 0,
@@ -286,24 +281,19 @@
   }
 
   /*
-   * Darkens the bottom of a photo so overlaid text stays legible.
-   *
-   * Necessary rather than stylistic: admins upload whatever photo they have, and a
-   * bright one would otherwise leave white caption text unreadable. The gradient
-   * guarantees contrast regardless of the image.
+   * Darkens the bottom of a photo so overlaid text stays legible. Necessary
+   * rather than stylistic: admins upload whatever photo they have, and a bright
+   * one would otherwise leave white caption text unreadable.
    */
   .image-scrim {
-    background-image: linear-gradient(to top, rgb(4 26 51 / 0.88) 0%, rgb(4 26 51 / 0.35) 45%, transparent 100%);
+    background-image: linear-gradient(to top, rgb(2 12 24 / 0.92) 0%, rgb(2 12 24 / 0.4) 45%, transparent 100%);
   }
 
   /* ── Motion ─────────────────────────────────────────────────────────────── */
 
   /*
-   * A short rise as a section enters the viewport.
-   *
-   * Deliberately small — 12px and 500ms. Big entrance animations are the other
-   * marker of a generated page; this is only meant to make scrolling feel like the
-   * page is responding, and it is switched off entirely under reduced-motion above.
+   * A short rise as a section enters the viewport. Deliberately small — 12px and
+   * 500ms — and switched off entirely under reduced-motion above.
    */
   .reveal {
     opacity: 0;
@@ -320,23 +310,13 @@
 
   /* ── Text ───────────────────────────────────────────────────────────────── */
 
-  /*
-   * Body copy inside a content block. Set once so every paragraph on the site has
-   * the same measure and leading, which is most of what makes dense text readable.
-   */
   .prose-block p {
     max-width: 68ch;
     line-height: 1.75;
   }
 
-  /*
-   * A gold underline that sits below the baseline rather than through it.
-   *
-   * text-decoration on a serif at these sizes crowds the descenders; a background
-   * gradient can be positioned exactly.
-   */
   .link-underline {
-    background-image: linear-gradient(var(--color-gold), var(--color-gold));
+    background-image: linear-gradient(var(--color-sky), var(--color-sky));
     background-repeat: no-repeat;
     background-size: 0% 2px;
     background-position: 0 100%;

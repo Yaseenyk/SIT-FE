@@ -8,6 +8,7 @@
 import { API_V1, api } from "./client";
 import type {
   Achievement,
+  AdminMember,
   ApplicationSummary,
   AdminSettings,
   AdminStats,
@@ -94,6 +95,9 @@ export const committees = {
 
 export const members = {
   list: (committeeId?: string) => api.get<Member[]>(path("/members"), { query: { committeeId } }),
+
+  /** With phone and email. Admin-only — see the rule on /members/admin in SecurityConfig. */
+  listForAdmin: () => api.get<AdminMember[]>(path("/members/admin")),
   create: (body: unknown) => api.post<Member>(path("/members"), body),
   update: (id: string, body: unknown) => api.put<Member>(path(`/members/${id}`), body),
   remove: (id: string) => api.delete<void>(path(`/members/${id}`)),

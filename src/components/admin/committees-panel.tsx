@@ -103,7 +103,7 @@ export function CommitteesPanel() {
         <ErrorNotice error={committees.error} onRetry={committees.reload} />
       ) : (
         <TableShell>
-          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Committee</th>
               <th className="px-4 py-3 text-start">Type</th>
@@ -113,7 +113,7 @@ export function CommitteesPanel() {
           </thead>
           <tbody>
             {list.map((committee, index) => (
-              <tr key={committee.id} className="border-t border-rule">
+              <tr key={committee.id} className="border-t border-line">
                 <td className="px-4 py-3">
                   <span aria-hidden className="me-2">
                     {committee.icon}

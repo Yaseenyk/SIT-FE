@@ -121,7 +121,7 @@ export function SignUpForm({ onDone }: { onDone?: () => void }) {
           <button
             type="button"
             onClick={() => setShow((value) => !value)}
-            className="absolute inset-y-0 end-0 px-3.5 text-xs font-semibold text-muted hover:text-navy2"
+            className="absolute inset-y-0 end-0 px-3.5 text-xs font-semibold text-muted hover:text-sky"
           >
             {show ? "Hide" : "Show"}
           </button>

@@ -89,7 +89,7 @@ export function EventsPanel() {
         <ErrorNotice error={events.error} onRetry={events.reload} />
       ) : (
         <TableShell>
-          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-3 text-start">Event</th>
               <th className="px-4 py-3 text-start">When</th>
@@ -99,7 +99,7 @@ export function EventsPanel() {
           </thead>
           <tbody>
             {(events.data ?? []).map((item) => (
-              <tr key={item.id} className="border-t border-rule">
+              <tr key={item.id} className="border-t border-line">
                 <td className="px-4 py-3">
                   <span aria-hidden className="me-2">
                     {item.emoji}
@@ -316,12 +316,12 @@ function AttendeesModal({ event, onClose }: { event: AisaEvent | null; onClose: 
       ) : attendees.error ? (
         <ErrorNotice error={attendees.error} onRetry={attendees.reload} />
       ) : rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-rule px-6 py-10 text-center text-xs text-muted">
+        <p className="rounded-xl border border-dashed border-line px-6 py-10 text-center text-xs text-muted">
           Nobody has registered yet.
         </p>
       ) : (
         <TableShell>
-          <thead className="bg-sunken text-[0.65rem] tracking-wider text-muted uppercase">
+          <thead className="bg-card2 text-[0.65rem] tracking-wider text-muted uppercase">
             <tr>
               <th className="px-4 py-2.5 text-start">Name</th>
               <th className="px-4 py-2.5 text-start">Roll / year</th>
@@ -330,7 +330,7 @@ function AttendeesModal({ event, onClose }: { event: AisaEvent | null; onClose: 
           </thead>
           <tbody>
             {rows.map((person) => (
-              <tr key={person.uid} className="border-t border-rule">
+              <tr key={person.uid} className="border-t border-line">
                 <td className="px-4 py-2.5">
                   <span className="block text-sm font-medium text-ink">{person.name ?? "—"}</span>
                   <span className="block text-xs text-muted">{person.email}</span>

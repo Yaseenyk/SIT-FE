@@ -23,10 +23,10 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const variants = {
-    primary: "bg-navy text-white hover:bg-navy3",
-    secondary: "border border-rule-strong bg-page text-ink hover:bg-surface",
-    ghost: "text-navy2 hover:bg-navy-tint",
-    danger: "border border-red/30 text-red hover:bg-red-soft",
+    primary: "bg-sky2 text-white hover:bg-sky3",
+    secondary: "border border-line2 bg-bg text-ink hover:bg-bg2",
+    ghost: "text-sky hover:bg-sky-tint",
+    danger: "border border-rose/30 text-rose hover:bg-rose-soft",
   } as const;
 
   return (
@@ -73,7 +73,7 @@ export function FilterTabs<T extends string>({
     <div
       role="tablist"
       aria-label={label}
-      className={cn("flex flex-wrap items-end gap-6 border-b border-rule", className)}
+      className={cn("flex flex-wrap items-end gap-6 border-b border-line", className)}
     >
       {options.map((option) => {
         const active = option.value === value;
@@ -87,7 +87,7 @@ export function FilterTabs<T extends string>({
               "-mb-px border-b-2 pb-2.5 text-sm font-semibold transition-colors",
               active
                 ? "border-gold text-ink"
-                : "border-transparent text-muted hover:border-rule-strong hover:text-ink",
+                : "border-transparent text-muted hover:border-line2 hover:text-ink",
             )}
           >
             {option.label}
@@ -139,23 +139,23 @@ export function Modal({
         if (e.target === ref.current) onClose();
       }}
       className={cn(
-        "m-auto w-[min(40rem,calc(100vw-2rem))] rounded border border-rule bg-page p-0 text-body",
-        "backdrop:bg-navy/40",
+        "m-auto w-[min(40rem,calc(100vw-2rem))] rounded border border-line bg-bg p-0 text-body",
+        "backdrop:bg-sky2/40",
       )}
     >
-      <div className="flex items-center justify-between border-b border-rule px-6 py-4">
-        <h3 className="font-serif text-lg font-bold text-ink">{title}</h3>
+      <div className="flex items-center justify-between border-b border-line px-6 py-4">
+        <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
         <button
           onClick={onClose}
           aria-label="Close"
-          className="rounded px-2 py-1 text-muted transition-colors hover:bg-surface hover:text-ink"
+          className="rounded px-2 py-1 text-muted transition-colors hover:bg-bg2 hover:text-ink"
         >
           ✕
         </button>
       </div>
       <div className="max-h-[70vh] overflow-y-auto px-6 py-5">{children}</div>
       {footer ? (
-        <div className="flex justify-end gap-2 border-t border-rule bg-surface px-6 py-4">
+        <div className="flex justify-end gap-2 border-t border-line bg-bg2 px-6 py-4">
           {footer}
         </div>
       ) : null}
@@ -173,9 +173,9 @@ export function ErrorNotice({ error, onRetry }: { error: ApiError; onRetry?: () 
   return (
     <div
       role="alert"
-      className="col-span-full rounded border border-red/25 bg-red-soft px-6 py-6 text-center"
+      className="col-span-full rounded border border-rose/25 bg-rose-soft px-6 py-6 text-center"
     >
-      <p className="font-serif text-base font-semibold text-red">Could not load this section</p>
+      <p className="font-display text-base font-semibold text-rose">Could not load this section</p>
       <p className="mx-auto mt-2 max-w-md text-sm text-body">{error.message}</p>
       {onRetry ? (
         <Button variant="secondary" size="sm" className="mt-4" onClick={onRetry}>

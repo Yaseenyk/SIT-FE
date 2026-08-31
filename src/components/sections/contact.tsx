@@ -15,8 +15,8 @@ type Status =
   | { kind: "failed"; message: string };
 
 const FIELD =
-  "w-full rounded border border-rule bg-page px-3 py-2.5 text-sm text-ink " +
-  "placeholder:text-muted/70 transition-colors focus:border-navy2 focus:outline-none";
+  "w-full rounded border border-line bg-bg px-3 py-2.5 text-sm text-ink " +
+  "placeholder:text-muted/70 transition-colors focus:border-sky focus:outline-none";
 
 export function Contact() {
   const { settings } = useSettings();
@@ -52,7 +52,7 @@ export function Contact() {
   const sending = status.kind === "sending";
 
   return (
-    <section id="contact" className="border-b border-rule bg-surface py-16 sm:py-20">
+    <section id="contact" className="border-b border-line bg-bg2 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           eyebrow="Get in touch"
@@ -64,7 +64,7 @@ export function Contact() {
           {/* Address block first — the convention on an institutional contact page. */}
           <div className="space-y-4 lg:col-span-2">
             <div className="card p-6">
-              <h3 className="font-serif text-base font-bold text-ink">Association office</h3>
+              <h3 className="font-display text-base font-bold text-ink">Association office</h3>
               <dl className="mt-4 space-y-4 text-sm">
                 {settings?.address ? (
                   <div>
@@ -76,7 +76,7 @@ export function Contact() {
                         href={mapsHref(settings.address)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-navy2 hover:underline"
+                        className="hover:text-sky hover:underline"
                       >
                         {settings.address}
                       </a>
@@ -89,7 +89,7 @@ export function Contact() {
                       Email
                     </dt>
                     <dd className="mt-1 break-all text-ink">
-                      <a href={`mailto:${settings.email}`} className="hover:text-navy2 hover:underline">
+                      <a href={`mailto:${settings.email}`} className="hover:text-sky hover:underline">
                         {settings.email}
                       </a>
                     </dd>
@@ -101,7 +101,7 @@ export function Contact() {
                       Telephone
                     </dt>
                     <dd className="mt-1 text-ink">
-                      <a href={telHref(settings.phone)} className="hover:text-navy2 hover:underline">
+                      <a href={telHref(settings.phone)} className="hover:text-sky hover:underline">
                         {settings.phone}
                       </a>
                     </dd>
@@ -110,13 +110,13 @@ export function Contact() {
               </dl>
 
               {settings?.linkedin || settings?.instagram ? (
-                <div className="mt-5 flex gap-2 border-t border-rule pt-4">
+                <div className="mt-5 flex gap-2 border-t border-line pt-4">
                   {settings.linkedin ? (
                     <a
                       href={settings.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded border border-rule-strong px-3 py-1.5 text-xs font-semibold text-navy2 hover:bg-navy-tint"
+                      className="rounded border border-line2 px-3 py-1.5 text-xs font-semibold text-sky hover:bg-sky-tint"
                     >
                       LinkedIn
                     </a>
@@ -126,7 +126,7 @@ export function Contact() {
                       href={settings.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded border border-rule-strong px-3 py-1.5 text-xs font-semibold text-navy2 hover:bg-navy-tint"
+                      className="rounded border border-line2 px-3 py-1.5 text-xs font-semibold text-sky hover:bg-sky-tint"
                     >
                       Instagram
                     </a>
@@ -141,13 +141,13 @@ export function Contact() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="c-name" className="mb-1.5 block text-sm font-semibold text-ink">
-                    Name <span className="text-red">*</span>
+                    Name <span className="text-rose">*</span>
                   </label>
                   <input id="c-name" name="name" required maxLength={160} className={FIELD} />
                 </div>
                 <div>
                   <label htmlFor="c-email" className="mb-1.5 block text-sm font-semibold text-ink">
-                    Email <span className="text-red">*</span>
+                    Email <span className="text-rose">*</span>
                   </label>
                   <input
                     id="c-email"
@@ -169,7 +169,7 @@ export function Contact() {
 
               <div>
                 <label htmlFor="c-message" className="mb-1.5 block text-sm font-semibold text-ink">
-                  Message <span className="text-red">*</span>
+                  Message <span className="text-rose">*</span>
                 </label>
                 <textarea
                   id="c-message"
@@ -204,9 +204,9 @@ export function Contact() {
                 {/* role=status so the outcome is announced, not just shown. */}
                 <p role="status" className="text-sm">
                   {status.kind === "sent" ? (
-                    <span className="text-green">Thank you — we will reply shortly.</span>
+                    <span className="text-emerald">Thank you — we will reply shortly.</span>
                   ) : status.kind === "failed" ? (
-                    <span className="text-red">{status.message}</span>
+                    <span className="text-rose">{status.message}</span>
                   ) : null}
                 </p>
               </div>

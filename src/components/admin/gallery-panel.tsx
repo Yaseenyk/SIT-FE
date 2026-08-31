@@ -116,13 +116,13 @@ export function GalleryPanel() {
       ) : items.error ? (
         <ErrorNotice error={items.error} onRetry={items.reload} />
       ) : (items.data ?? []).length === 0 ? (
-        <p className="rounded-xl border border-dashed border-rule px-6 py-12 text-center text-xs text-muted">
+        <p className="rounded-xl border border-dashed border-line px-6 py-12 text-center text-xs text-muted">
           No photos yet.
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
           {(items.data ?? []).map((item) => (
-            <figure key={item.id} className="overflow-hidden rounded-lg border border-rule">
+            <figure key={item.id} className="overflow-hidden rounded-lg border border-line">
               <img src={item.url} alt={item.title} className="aspect-square w-full object-cover" />
               <figcaption className="space-y-2 p-2">
                 <p className="truncate text-[0.65rem]" title={item.title}>
@@ -197,12 +197,12 @@ export function GalleryPanel() {
                 if (event.target.files?.length) onFiles(event.target.files);
                 event.target.value = "";
               }}
-              className="w-full text-xs text-muted file:mr-3 file:rounded-md file:border-0 file:bg-sunken file:px-3 file:py-1.5 file:text-xs file:text-navy2"
+              className="w-full text-xs text-muted file:mr-3 file:rounded-md file:border-0 file:bg-card2 file:px-3 file:py-1.5 file:text-xs file:text-sky"
             />
           </Field>
 
           {uploading ? (
-            <p className="text-xs text-navy2">
+            <p className="text-xs text-sky">
               Uploading {uploading.done}/{uploading.total}…
             </p>
           ) : null}
