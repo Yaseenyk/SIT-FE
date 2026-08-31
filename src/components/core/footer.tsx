@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SECTIONS, SITE } from "@/lib/site";
+import { Logo } from "@/components/core/logo";
 import { useSettings } from "@/lib/settings-context";
 import { mapsHref, telHref } from "@/lib/utils";
 
@@ -19,15 +20,7 @@ export function Footer() {
     <footer className="border-t border-line bg-card text-muted">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-1">
-          <div className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-sky2 to-cyan font-display text-[0.55rem] leading-none font-bold text-bg"
-            >
-              AISA
-            </span>
-            <span className="font-display text-base font-bold text-white">{SITE.name}</span>
-          </div>
+          <Logo className="h-10" />
           <p className="mt-4 text-sm leading-relaxed">
             {SITE.longName}
             <br />

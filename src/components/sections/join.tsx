@@ -1,42 +1,32 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState, type FormEvent } from "react";
-import { Badge } from "@/components/ui/primitives";
-import {
-  applications as applicationsApi,
-  committees as committeesApi,
-  members as membersApi,
-} from "@/lib/api/endpoints";
-import { useAuth } from "@/lib/auth/context";
+import { useMemo } from "react";
+import { committees as committeesApi, members as membersApi } from "@/lib/api/endpoints";
 import { useApi } from "@/lib/hooks/use-api";
 import { useReveal } from "@/lib/hooks/use-reveal";
+import { SITE } from "@/lib/site";
 
 /**
  * How a student joins, and which posts are currently open.
  *
- * <p>Added because the site answered every question except the one a student visiting it
- * actually has. The open-position list is derived from real data — committees that no
- * member is currently assigned to — rather than being a static list someone has to
- * remember to update, so it is correct the moment the roster changes.
+ * <h2>Why this is a Google Form and not an in-app application</h2>
  *
- * <p>It is now an application FORM rather than a "get in touch" instruction. The previous
- * version told a student to speak to an office-bearer, which is exactly the informal
- * process that leaves no record and no reply.
+ * <p>It used to be a form tied to an account: sign up, confirm an email address, then
+ * apply. That put a signup wall in front of the one action the association most wants a
+ * student to take, and it is the wrong trade — an account is worth asking for to register
+ * for an event, where an organiser needs to reach a named person on the day, and not worth
+ * asking for to express interest in joining.
+ *
+ * <p>Accounts are untouched; joining simply no longer needs one.
+ *
+ * <p>The open-position list is still derived from real data — committees that no member is
+ * currently assigned to — rather than a static list someone has to remember to update, so
+ * it stays correct the moment the roster changes.
  */
 export function Join() {
-  const { state } = useAuth();
   const committees = useApi(() => committeesApi.list(), []);
   const members = useApi(() => membersApi.list(), []);
-  const mine = useApi(
-    () => (state === "active" ? applicationsApi.mine() : Promise.resolve([])),
-    [state],
-  );
   const reveal = useReveal<HTMLDivElement>();
-
-  const [selected, setSelected] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<{ tone: "error" | "success"; text: string } | null>(null);
 
   const open = useMemo(() => {
     const filled = new Set(
@@ -47,46 +37,11 @@ export function Join() {
       .sort((a, b) => a.order - b.order);
   }, [committees.data, members.data]);
 
-  // Applying is allowed to any non-advisory committee, not only the empty ones: a
-  // committee can want more people without being empty. The "open" list is a prompt.
-  const choosable = useMemo(
-    () => (committees.data ?? []).filter((c) => c.type !== "advisory").sort((a, b) => a.order - b.order),
-    [committees.data],
-  );
-
-  const pending = new Set(
-    (mine.data ?? []).filter((a) => a.status === "PENDING").map((a) => a.committeeId),
-  );
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    setBusy(true);
-    setNotice(null);
-    try {
-      await applicationsApi.apply({
-        committeeId: String(data.get("committeeId") ?? ""),
-        motivation: String(data.get("motivation") ?? ""),
-      });
-      setNotice({
-        tone: "success",
-        text: "Application sent. You can follow it from your account page.",
-      });
-      setSelected("");
-      event.currentTarget.reset();
-      mine.reload();
-    } catch (applyError) {
-      setNotice({
-        tone: "error",
-        text: applyError instanceof Error ? applyError.message : "Could not send your application.",
-      });
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
-    <section id="join" className="band-deep pattern-dots relative isolate overflow-hidden py-20 text-white sm:py-24">
+    <section
+      id="join"
+      className="band-deep pattern-dots relative isolate overflow-hidden py-20 text-white sm:py-24"
+    >
       <div ref={reveal} className="reveal mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           <div>
@@ -105,15 +60,29 @@ export function Join() {
 
             <ol className="mt-9 grid gap-6 sm:grid-cols-3">
               {[
-                { step: "01", title: "Create an account", body: "Sign up with your institute email address." },
-                { step: "02", title: "Pick a committee", body: "Choose the one whose work matches your interests." },
-                { step: "03", title: "Start contributing", body: "An office-bearer reviews your application and gets in touch." },
+                {
+                  step: "01",
+                  title: "Fill in the form",
+                  body: "A few minutes, and no account needed.",
+                },
+                {
+                  step: "02",
+                  title: "Pick a committee",
+                  body: "Choose the one whose work matches your interests.",
+                },
+                {
+                  step: "03",
+                  title: "Start contributing",
+                  body: "An office-bearer reviews it and gets in touch.",
+                },
               ].map((item) => (
                 <li key={item.step} className="border-t-2 border-sky pt-4">
                   <span className="font-mono text-xs font-semibold text-sky tabular-nums">
                     {item.step}
                   </span>
-                  <h3 className="mt-2 font-display text-base font-bold text-white">{item.title}</h3>
+                  <h3 className="mt-2 font-display text-base font-bold text-white">
+                    {item.title}
+                  </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-white/65">{item.body}</p>
                 </li>
               ))}
@@ -130,14 +99,11 @@ export function Join() {
                 </h3>
                 <ul className="mt-4 flex flex-wrap gap-2">
                   {open.map((committee) => (
-                    <li key={committee.id}>
-                      <button
-                        type="button"
-                        onClick={() => setSelected(committee.id)}
-                        className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85 transition-colors hover:border-sky hover:text-white"
-                      >
-                        {committee.name}
-                      </button>
+                    <li
+                      key={committee.id}
+                      className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/85"
+                    >
+                      {committee.name}
                     </li>
                   ))}
                 </ul>
@@ -145,110 +111,28 @@ export function Join() {
             ) : null}
           </div>
 
-          {/* ── The form ──────────────────────────────────────────────────── */}
+          {/* ── The application ───────────────────────────────────────────── */}
           <aside className="self-start rounded-lg border border-white/15 bg-white/[0.07] p-7 shadow-float backdrop-blur-sm">
             <h3 className="font-display text-xl font-bold text-white">Apply to a committee</h3>
+            <p className="mt-4 text-sm leading-relaxed text-white/75">
+              Applications are collected through a short Google Form. You do not need an
+              account on this site to apply — fill it in and an office-bearer will get back
+              to you.
+            </p>
 
-            {state === "loading" ? (
-              <p className="mt-5 animate-pulse text-sm text-white/60">Checking your account…</p>
-            ) : state !== "active" ? (
-              <div className="mt-5 space-y-5">
-                <p className="text-sm leading-relaxed text-white/70">
-                  Applications are tied to your account, so the committee can reply to you
-                  and you can see where your application stands.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    href={state === "signed-out" ? "/signup/" : "/account/"}
-                    className="rounded-md bg-sky px-5 py-2.5 text-sm font-bold text-bg transition-colors hover:bg-sky3"
-                  >
-                    {state === "signed-out" ? "Create an account" : "Finish setting up"}
-                  </Link>
-                  {state === "signed-out" ? (
-                    <Link
-                      href="/login/"
-                      className="rounded-md border border-white/25 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
-                    >
-                      Sign in
-                    </Link>
-                  ) : null}
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={onSubmit} className="mt-5 space-y-5">
-                <div>
-                  <label htmlFor="committeeId" className="block text-sm font-semibold text-white">
-                    Committee
-                  </label>
-                  <select
-                    id="committeeId"
-                    name="committeeId"
-                    required
-                    value={selected}
-                    onChange={(e) => setSelected(e.target.value)}
-                    className="mt-2 w-full rounded-md border border-white/25 bg-bg px-3.5 py-2.5 text-sm text-white focus:border-sky focus:outline-none"
-                  >
-                    <option value="">Choose a committee…</option>
-                    {choosable.map((committee) => (
-                      <option key={committee.id} value={committee.id} disabled={pending.has(committee.id)}>
-                        {committee.name}
-                        {pending.has(committee.id) ? " — already applied" : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            <a
+              href={SITE.joinFormUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-md bg-sky px-5 py-3 text-sm font-bold text-bg transition-all hover:-translate-y-0.5 hover:bg-sky3"
+            >
+              Open the application form
+              <span aria-hidden>↗</span>
+            </a>
 
-                <div>
-                  <label htmlFor="motivation" className="block text-sm font-semibold text-white">
-                    Why do you want to join?
-                  </label>
-                  <p className="mt-0.5 text-xs text-white/55">
-                    A few sentences. At least 20 characters.
-                  </p>
-                  <textarea
-                    id="motivation"
-                    name="motivation"
-                    required
-                    minLength={20}
-                    maxLength={2000}
-                    rows={5}
-                    placeholder="What you would like to work on, and anything relevant you have done before."
-                    className="mt-2 w-full rounded-md border border-white/25 bg-bg px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-sky focus:outline-none"
-                  />
-                </div>
-
-                {notice ? (
-                  <p
-                    role="alert"
-                    className={`rounded-md border px-3.5 py-2.5 text-sm ${
-                      notice.tone === "success"
-                        ? "border-emerald/40 bg-emerald/15 text-white"
-                        : "border-rose/40 bg-rose/15 text-white"
-                    }`}
-                  >
-                    {notice.text}
-                  </p>
-                ) : null}
-
-                <button
-                  type="submit"
-                  disabled={busy}
-                  className="w-full rounded-md bg-sky px-5 py-3 text-sm font-bold text-bg transition-all hover:-translate-y-0.5 hover:bg-sky3 disabled:opacity-60"
-                >
-                  {busy ? "Sending…" : "Send application"}
-                </button>
-
-                {(mine.data ?? []).length > 0 ? (
-                  <p className="flex flex-wrap items-center gap-2 text-xs text-white/60">
-                    <Badge tone="gold">{(mine.data ?? []).length}</Badge>
-                    application{(mine.data ?? []).length === 1 ? "" : "s"} so far —{" "}
-                    <Link href="/account/" className="font-semibold text-sky hover:underline">
-                      see them on your account
-                    </Link>
-                  </p>
-                ) : null}
-              </form>
-            )}
+            <p className="mt-4 text-xs leading-relaxed text-white/55">
+              The form opens in a new tab. Have your roll number and year to hand.
+            </p>
           </aside>
         </div>
       </div>

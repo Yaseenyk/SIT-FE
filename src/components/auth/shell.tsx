@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Logo } from "@/components/core/logo";
 import { SITE } from "@/lib/site";
 
 /**
@@ -30,14 +31,8 @@ export function AuthShell({
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
       <aside className="band-deep pattern-dots relative isolate hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex">
-        <Link href="/" className="flex items-center gap-3.5">
-          <span
-            aria-hidden
-            className="flex size-11 shrink-0 items-center justify-center rounded-sm bg-white/10 font-display text-[0.7rem] leading-none font-bold text-white ring-1 ring-white/20"
-          >
-            AISA
-          </span>
-          <span className="font-display text-lg font-bold">{SITE.longName}</span>
+        <Link href="/" aria-label={`${SITE.name} — home`}>
+          <Logo className="h-12" />
         </Link>
 
         <div className="max-w-md">
@@ -70,17 +65,8 @@ export function AuthShell({
         <div className="mx-auto w-full max-w-md">
           {/* The wordmark repeats here because the panel beside it is hidden on mobile,
               where this becomes the only thing identifying the site. */}
-          <Link
-            href="/"
-            className="mb-10 inline-flex items-center gap-2.5 font-display text-lg font-bold text-sky2 lg:hidden"
-          >
-            <span
-              aria-hidden
-              className="flex size-9 items-center justify-center rounded-sm bg-sky2 text-[0.6rem] leading-none font-bold text-white"
-            >
-              AISA
-            </span>
-            {SITE.name}
+          <Link href="/" className="mb-10 inline-block lg:hidden" aria-label={`${SITE.name} — home`}>
+            <Logo className="h-10" />
           </Link>
 
           <h1 className="font-display text-3xl leading-tight font-bold text-ink">{title}</h1>
