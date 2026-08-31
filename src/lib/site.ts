@@ -32,6 +32,17 @@ export const SITE = {
   institute: "Dr. Bapuji Salunkhe Institute of Engineering & Technology",
   city: "Kolhapur",
   tagline: "Empowering AIML Students at BSIET Kolhapur",
+  /**
+   * Joining is a Google Form, not an in-app flow.
+   *
+   * Deliberate: a student should not have to create an account to ask to join a
+   * committee. The account exists for event registration and for the dashboard; putting
+   * a signup wall in front of an application would lose exactly the people the form is
+   * meant to reach.
+   */
+  joinFormUrl:
+    "https://docs.google.com/forms/d/1mvb-sU8uRyGyR3rqxyNNZNejyKDoEDnkRfqjGVbSiPw/viewform",
+
   description:
     "Official website of AISA — the AIML Student Association, Department of CSE-AIML, " +
     "Dr. Bapuji Salunkhe Institute of Engineering & Technology, Kolhapur.",

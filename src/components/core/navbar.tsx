@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Logo } from "@/components/core/logo";
 import { SECTIONS, SITE } from "@/lib/site";
 import { useAuth } from "@/lib/auth/context";
 import { useSettings } from "@/lib/settings-context";
@@ -76,20 +77,25 @@ export function Navbar() {
       {/* Band 2 — the masthead. Association, department, institute, in that order. */}
       <div className="border-b border-line bg-bg">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <Link href="/" className="flex items-center gap-3.5" onClick={() => setOpen(false)}>
-            <span
-              aria-hidden
-              className="flex size-11 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-sky2 to-cyan font-display text-[0.6rem] leading-none font-bold text-bg"
-            >
-              AISA
-            </span>
-            <span className="leading-tight">
-              <span className="block font-display text-lg font-bold text-ink sm:text-xl">
-                {SITE.longName}
-              </span>
-              <span className="block text-[0.72rem] text-muted">
-                {SITE.department} · {SITE.institute}
-              </span>
+          {/*
+            Sized to be READ, not to fit a conventional header height.
+
+            The asset is a wide banner rather than a compact mark, so at the 44px a logo
+            tile usually gets, its own department line renders about two pixels tall and
+            the whole thing is a smudge. It carries "DEPARTMENT OF CSE — ARTIFICIAL
+            INTELLIGENCE & MACHINE LEARNING" itself, which is why the text beside it is
+            now only the institute: repeating the department would say it twice.
+          */}
+          <Link
+            href="/"
+            className="flex min-w-0 items-center gap-4"
+            onClick={() => setOpen(false)}
+            aria-label={`${SITE.name} — home`}
+          >
+            <Logo className="h-14 sm:h-16" priority />
+            <span className="hidden min-w-0 border-s border-line ps-4 text-[0.78rem] leading-snug text-muted xl:block">
+              {SITE.institute}
+              <span className="block">{SITE.city}</span>
             </span>
           </Link>
 

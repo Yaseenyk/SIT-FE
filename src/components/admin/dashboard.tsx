@@ -8,7 +8,6 @@ import { useAuth } from "@/lib/auth/context";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { AchievementsPanel } from "./achievements-panel";
-import { ApplicationsPanel } from "./applications-panel";
 import { CommitteesPanel } from "./committees-panel";
 import { EventsPanel } from "./events-panel";
 import { GalleryPanel } from "./gallery-panel";
@@ -23,7 +22,6 @@ const TABS = [
   { id: "events", label: "Events" },
   { id: "gallery", label: "Gallery" },
   { id: "achievements", label: "Achievements" },
-  { id: "applications", label: "Applications" },
   { id: "users", label: "Accounts" },
   { id: "messages", label: "Inbox" },
   { id: "settings", label: "Settings" },
@@ -123,7 +121,6 @@ export function Dashboard() {
         {tab === "events" ? <EventsPanel /> : null}
         {tab === "gallery" ? <GalleryPanel /> : null}
         {tab === "achievements" ? <AchievementsPanel /> : null}
-        {tab === "applications" ? <ApplicationsPanel /> : null}
         {tab === "users" ? <UsersPanel /> : null}
         {tab === "messages" ? <MessagesPanel /> : null}
         {tab === "settings" ? <SettingsPanel /> : null}
