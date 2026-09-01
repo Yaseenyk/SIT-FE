@@ -1,14 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Badge, DateBlock, EmptyState, SectionHeading, Skeleton } from "@/components/ui/primitives";
 import { ErrorNotice, FilterTabs } from "@/components/ui/interactive";
-import {
-  events as eventsApi,
-  registrations as registrationsApi,
-} from "@/lib/api/endpoints";
-import { useAuth } from "@/lib/auth/context";
+import { events as eventsApi } from "@/lib/api/endpoints";
 import { useApi } from "@/lib/hooks/use-api";
 import { useReveal } from "@/lib/hooks/use-reveal";
 import type { AisaEvent, EventStatus } from "@/types/api";
@@ -33,7 +28,6 @@ const TABS = [
 export function Events() {
   const [tab, setTab] = useState<EventStatus>("upcoming");
   const reveal = useReveal<HTMLDivElement>();
-  const { state } = useAuth();
 
   /*
    * Refetched per tab rather than fetched once and split locally. Unlike the Structure
@@ -43,15 +37,6 @@ export function Events() {
   const { data, error, loading, reload } = useApi(() => eventsApi.list(tab), [tab]);
   const events = data ?? [];
 
-  // Only fetched when signed in, so a visitor makes no authenticated request at all.
-  const mine = useApi(
-    () => (state === "active" ? registrationsApi.mine() : Promise.resolve([])),
-    [state],
-  );
-  const registeredIds = useMemo(
-    () => new Set((mine.data ?? []).map((r) => r.eventId)),
-    [mine.data],
-  );
 
   return (
     <section id="events" className="border-t border-line py-20 sm:py-24">
@@ -94,8 +79,6 @@ export function Events() {
                 key={event.id}
                 event={event}
                 past={tab === "past"}
-                registered={registeredIds.has(event.id)}
-                onChanged={mine.reload}
               />
             ))}
           </ul>
@@ -116,13 +99,9 @@ export function Events() {
 function EventCard({
   event,
   past,
-  registered,
-  onChanged,
 }: {
   event: AisaEvent;
   past: boolean;
-  registered: boolean;
-  onChanged: () => void;
 }) {
   const link = event.linkUrl && event.linkUrl !== "#" ? event.linkUrl : null;
 
@@ -159,20 +138,38 @@ function EventCard({
             </p>
           ) : null}
 
+          {/*
+            Registration is the event's OWN link — a Google Form the organiser sets per
+            event, in the dashboard's "Registration link" field. There is no account and
+            no attendee list here: the responses land in the organiser's spreadsheet,
+            which is where they were going to be worked from anyway.
+          */}
           <div className="mt-auto flex flex-wrap items-center gap-3 pt-5">
-            {past ? null : (
-              <RegisterButton event={event} registered={registered} onChanged={onChanged} />
-            )}
             {link ? (
-              <a
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-semibold text-sky hover:underline"
-              >
-                {past ? "Read more" : "Details"} ↗
-              </a>
-            ) : null}
+              past ? (
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-sky hover:underline"
+                >
+                  Read more ↗
+                </a>
+              ) : (
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md bg-sky px-4 py-2 text-sm font-bold text-bg transition-colors hover:bg-sky3"
+                >
+                  Register ↗
+                </a>
+              )
+            ) : past ? null : (
+              <span className="text-xs text-muted italic">
+                Registration opens nearer the date.
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -188,86 +185,3 @@ function EventCard({
  * than one that says what it needs. The unverified and unregistered cases are handled by
  * the account screens, which is why this only has to distinguish "active" from "not".
  */
-function RegisterButton({
-  event,
-  registered,
-  onChanged,
-}: {
-  event: AisaEvent;
-  registered: boolean;
-  onChanged: () => void;
-}) {
-  const { state } = useAuth();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  if (state === "loading") {
-    return <Skeleton className="h-9 w-28" />;
-  }
-
-  if (state !== "active") {
-    return (
-      <Link
-        href={state === "signed-out" ? "/login/" : "/account/"}
-        className="rounded-md border border-line2 px-4 py-2 text-sm font-semibold text-sky transition-colors hover:bg-sky-tint"
-      >
-        Sign in to register
-      </Link>
-    );
-  }
-
-  if (registered) {
-    return (
-      <span className="flex flex-wrap items-center gap-3">
-        <Badge tone="green">You are registered</Badge>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={async () => {
-            setBusy(true);
-            setError(null);
-            try {
-              await registrationsApi.cancel(event.id);
-              onChanged();
-            } catch {
-              setError("Could not cancel. Try again.");
-            } finally {
-              setBusy(false);
-            }
-          }}
-          className="text-xs font-semibold text-muted hover:text-rose disabled:opacity-50"
-        >
-          {busy ? "Cancelling…" : "Cancel"}
-        </button>
-        {error ? <span className="text-xs text-rose">{error}</span> : null}
-      </span>
-    );
-  }
-
-  return (
-    <span className="flex flex-wrap items-center gap-3">
-      <button
-        type="button"
-        disabled={busy}
-        onClick={async () => {
-          setBusy(true);
-          setError(null);
-          try {
-            await registrationsApi.register(event.id);
-            onChanged();
-          } catch (registerError) {
-            setError(
-              registerError instanceof Error ? registerError.message : "Could not register.",
-            );
-          } finally {
-            setBusy(false);
-          }
-        }}
-        className="rounded-md bg-sky2 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky disabled:opacity-50"
-      >
-        {busy ? "Registering…" : "Register"}
-      </button>
-      {error ? <span className="text-xs text-rose">{error}</span> : null}
-    </span>
-  );
-}

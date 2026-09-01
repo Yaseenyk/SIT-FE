@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { NeuronCanvas } from "@/components/core/neuron-canvas";
 import { events as eventsApi, stats as statsApi } from "@/lib/api/endpoints";
 import { useApi } from "@/lib/hooks/use-api";
@@ -79,12 +78,19 @@ export function Hero() {
                 >
                   Upcoming events
                 </a>
-                <Link
-                  href="/signup/"
+                {/*
+                  "Explore committees", not "Create an account".
+                  
+                  Nothing a visitor comes here to do needs an account: the committees are
+                  public and applying to one is a Google Form. Leading with a signup asked
+                  for a commitment before showing any reason to make it.
+                */}
+                <a
+                  href="#structure"
                   className="rounded-md border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/15"
                 >
-                  Create an account
-                </Link>
+                  Explore committees
+                </a>
               </div>
             </div>
 

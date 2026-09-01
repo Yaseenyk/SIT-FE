@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Exo_2, JetBrains_Mono, Orbitron } from "next/font/google";
-import { SITE, SITE_URL } from "@/lib/site";
+import { BASE_PATH, SITE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 /**
@@ -43,6 +43,15 @@ export const metadata: Metadata = {
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
+  /*
+   * The full logo is a 2.4:1 lockup and illegible at 32px, so the icon is the
+   * "A"-with-head mark alone, flattened onto white. A tab strip is not always dark, and a
+   * navy mark on a transparent ground vanishes against one that is.
+   */
+  icons: {
+    icon: [{ url: `${BASE_PATH}/icon.png`, type: "image/png", sizes: "512x512" }],
+    apple: [{ url: `${BASE_PATH}/icon.png`, sizes: "512x512" }],
+  },
   keywords: [
     "AISA", "AIML", "AI", "Machine Learning", "BSIET", "Kolhapur",
     "CSE-AIML", "Student Association",

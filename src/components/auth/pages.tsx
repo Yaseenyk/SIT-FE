@@ -1,13 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, type ReactNode } from "react";
 import { AuthProvider, useAuth } from "@/lib/auth/context";
 import { AccountNotice } from "./account-notice";
 import { ForgotPasswordForm } from "./forgot-password-form";
 import { AuthNotice, AuthShell } from "./shell";
 import { SignInForm } from "./sign-in-form";
-import { SignUpForm } from "./sign-up-form";
 
 /**
  * The three public account routes.
@@ -31,8 +29,7 @@ import { SignUpForm } from "./sign-up-form";
 function useRedirectWhenSignedIn(state: string, isAdmin: boolean) {
   useEffect(() => {
     if (state !== "active") return;
-    // Admins have somewhere better to be than the public account page.
-    window.location.replace(isAdmin ? "./admin/" : "./account/");
+    window.location.replace("./admin/");
   }, [state, isAdmin]);
 }
 
@@ -74,44 +71,12 @@ function SignInInner() {
     <AuthShell
       title="Sign in"
       intro="For students and committee members of the Department of CSE (AI & ML)."
-      footer={
-        <>
-          Don&apos;t have an account?{" "}
-          <Link href="/signup/" className="font-semibold text-sky hover:underline">
-            Create one
-          </Link>
-        </>
-      }
     >
       <SignInForm />
     </AuthShell>
   );
 }
 
-function SignUpInner() {
-  const { state, isAdmin } = useAuth();
-  useRedirectWhenSignedIn(state, isAdmin);
-
-  if (state === "loading") return <AuthLoading />;
-  if (state !== "signed-out" && state !== "active") return <AccountNotice />;
-
-  return (
-    <AuthShell
-      title="Create your account"
-      intro="Open to every student of the Department of CSE (AI & ML)."
-      footer={
-        <>
-          Already have one?{" "}
-          <Link href="/login/" className="font-semibold text-sky hover:underline">
-            Sign in
-          </Link>
-        </>
-      }
-    >
-      <SignUpForm />
-    </AuthShell>
-  );
-}
 
 function AuthLoading() {
   return (
@@ -131,15 +96,6 @@ export function SignInPage() {
   );
 }
 
-export function SignUpPage() {
-  return (
-    <AuthProvider>
-      <Configured>
-        <SignUpInner />
-      </Configured>
-    </AuthProvider>
-  );
-}
 
 export function ForgotPasswordPage() {
   return (

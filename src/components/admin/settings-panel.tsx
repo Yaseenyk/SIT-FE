@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 
 import { useState, type FormEvent } from "react";
 import { Button, ErrorNotice } from "@/components/ui/interactive";
@@ -296,13 +295,6 @@ export function AccountPanel() {
           >
             Email me a password reset link
           </Button>
-
-          <Link
-            href="/account/"
-            className="inline-flex items-center rounded-lg border border-line2 px-4 py-2 text-sm font-semibold text-ink"
-          >
-            Edit my profile
-          </Link>
         </div>
 
         <div className="mt-8 border-t border-line pt-6">

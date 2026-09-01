@@ -1,19 +1,24 @@
 import { asset } from "@/lib/site";
 
 /**
- * The association's wordmark.
+ * The association's logo.
  *
- * <p>One component so the file path and the alt text exist once. The asset is a WIDE
- * lockup (roughly 2.4:1) reading "AISA / AIML Student Association", not a square icon —
- * so it replaces the whole brand block wherever it appears, rather than sitting beside a
- * repeat of the same words in text.
+ * <h2>Why it sits on a light plate</h2>
  *
- * <p>It goes through {@link asset} because a plain {@code <img src="/logo/...">} resolves
- * to the domain root on a GitHub project page and 404s with no build error — this site is
- * served from a subpath.
+ * <p>The artwork is drawn for a white ground: the "A", the head and the entire
+ * "ARTIFICIAL INTELLIGENCE & MACHINE LEARNING / STUDENT ASSOCIATION" line are deep navy.
+ * Placed straight onto this site's #020c18 they have almost no contrast and roughly half
+ * the mark disappears — the bright "ISA" survives and nothing else does.
  *
- * <p>Height is set and width is left to the aspect ratio, so the intrinsic dimensions are
- * declared and the row does not reflow when the image lands.
+ * <p>Recolouring somebody's logo is not ours to do, so it gets the background it was
+ * designed for. A light plate in a dark header is the ordinary answer to this and reads
+ * as a badge rather than as a mistake.
+ *
+ * <p>The source JPEG's white background was made transparent and the margin trimmed
+ * (`public/logo/aisa-logo.png`), so the plate's rounded corners are the plate's, not a
+ * white rectangle showing through. The original is kept at `public/logo/logo.jpeg`.
+ *
+ * <p>Width and height are declared so the header does not reflow when the image lands.
  */
 export function Logo({
   className = "h-10",
@@ -23,15 +28,19 @@ export function Logo({
   priority?: boolean;
 }) {
   return (
-    <img
-      src={asset("/logo/aisa-logo.jpg")}
-      alt="AISA — AIML Student Association"
-      width={1600}
-      height={676}
-      // The header logo is above the fold and part of the LCP; everything else can wait.
-      loading={priority ? "eager" : "lazy"}
-      fetchPriority={priority ? "high" : "auto"}
-      className={`${className} w-auto object-contain`}
-    />
+    <span
+      className={`inline-flex items-center justify-center rounded-lg bg-white px-3 py-2 shadow-raise ${className}`}
+    >
+      <img
+        src={asset("/logo/aisa-logo.png")}
+        alt="AISA — AI & ML Student Association"
+        width={760}
+        height={313}
+        // The header logo is above the fold and part of the LCP; everything else can wait.
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        className="h-full w-auto object-contain"
+      />
+    </span>
   );
 }

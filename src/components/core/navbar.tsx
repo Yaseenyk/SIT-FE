@@ -180,21 +180,30 @@ function AccountLink({
 }) {
   const { state, isAdmin, me } = useAuth();
 
-  // Nothing at all until the session is known. A link that says "Sign in" for a moment
-  // and then becomes the person's own name is worse than one that arrives a beat late.
+  // Nothing until the session is known. A link that says one thing and then becomes
+  // another is worse than one that arrives a beat late.
   if (state === "loading") return null;
 
+  /*
+   * "Admin", not "Sign in".
+   *
+   * The public site needs no account: committees are public and applying to one is a
+   * Google Form. The only person who signs in is whoever maintains the site, so the link
+   * says what it is for rather than inviting every visitor to make an account they would
+   * have no use for.
+   */
   if (state === "signed-out") {
     return (
-      <Link href="/login/" onClick={onNavigate} className={className}>
-        Sign in
+      <Link href="/admin/" onClick={onNavigate} className={className}>
+        Admin
       </Link>
     );
   }
 
+  // Signed in at all means signed in as the maintainer — there is no student account.
   return (
-    <Link href={isAdmin ? "/admin/" : "/account/"} onClick={onNavigate} className={className}>
-      {isAdmin ? "Dashboard" : (me?.name?.split(" ")[0] ?? "My account")}
+    <Link href="/admin/" onClick={onNavigate} className={className}>
+      {isAdmin ? "Dashboard" : (me?.name?.split(" ")[0] ?? "Admin")}
     </Link>
   );
 }
